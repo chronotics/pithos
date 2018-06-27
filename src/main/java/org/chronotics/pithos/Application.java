@@ -16,13 +16,6 @@ public class Application {
 	public static void main(String[] args) {
 		ApplicationContext context = 
 				SpringApplication.run(Application.class,args);
-		
-//		Properties prop = (Properties) context.getBean("propMySql");
-//		for(Object obj : prop.entrySet()) {
-//			System.out.println(obj);
-//		}
-//		String item = (String) prop.get("jdbc.driverClassName");
-//		System.out.println(item);
 	}
 
 }

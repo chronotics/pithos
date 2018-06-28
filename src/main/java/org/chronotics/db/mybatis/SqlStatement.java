@@ -260,6 +260,10 @@ public class SqlStatement {
 		
 		public Builder where(
 				String clause) {
+			if(clause == null) {
+				return this;
+			}
+
 			if(whereList == null) {
 				whereList = new ArrayList<Object>();
 			}

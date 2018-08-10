@@ -2,11 +2,7 @@ package org.chronotics.db.mybatis;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -576,8 +572,11 @@ public class SqlStatement {
 			int count_from,
 			int count_to) {
 		JSONObject object = new JSONObject();
-		JSONArray jsonArray = new JSONArray();
+		JSONArray columns = new JSONArray();
+        Set<String> columnSet = new HashSet<>();
+		JSONArray dataSource = new JSONArray();
 		int i = 0;
+		boolean columnSetAdded = false;
 		for (Map<String, Object> element : _resultSet) {
 			if (count_from <= i && i < count_to) {
 				JSONObject jsonChild = new JSONObject();
@@ -589,17 +588,46 @@ public class SqlStatement {
 						e.printStackTrace();
 						return null;
 					}
+					if(columnSetAdded == false) {
+					    columnSet.add(entry.getKey());
+                    }
 				}
-				jsonArray.put(jsonChild);
+				dataSource.put(jsonChild);
+				if(columnSetAdded == false && !columnSet.isEmpty()) {
+                    for(String v : columnSet) {
+                        JSONObject jsonColumn = new JSONObject();
+                        try {
+                            jsonColumn.put("title", v);
+                            jsonColumn.put("dataIndex", v);
+                            jsonColumn.put("key", v);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        columns.put(jsonColumn);
+                    }
+                    columnSetAdded = true;
+                }
 			}
 			i++;
 		}
-		try {
-			object.put("resultSet", jsonArray);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		switch(_resultType) {
+            case "antd":
+                try {
+                    object.put("dataSource", dataSource);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                try {
+                    object.put("columns", columns);
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                break;
+        }
 		return object;
 	}
 }

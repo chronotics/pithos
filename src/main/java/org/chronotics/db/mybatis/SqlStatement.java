@@ -570,4 +570,36 @@ public class SqlStatement {
 		return object;
 	}
 
+	public static JSONObject getJSonObject(
+			List<Map<String,Object>> _resultSet,
+			String _resultType,
+			int count_from,
+			int count_to) {
+		JSONObject object = new JSONObject();
+		JSONArray jsonArray = new JSONArray();
+		int i = 0;
+		for (Map<String, Object> element : _resultSet) {
+			if (count_from <= i && i < count_to) {
+				JSONObject jsonChild = new JSONObject();
+				for (Entry<String, Object> entry : element.entrySet()) {
+					Object entryObj = entry.getValue();
+					try {
+						jsonChild.put(entry.getKey(), entryObj);
+					} catch (JSONException e) {
+						e.printStackTrace();
+						return null;
+					}
+				}
+				jsonArray.put(jsonChild);
+			}
+			i++;
+		}
+		try {
+			object.put("resultSet", jsonArray);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return object;
+	}
 }

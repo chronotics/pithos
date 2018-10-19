@@ -29,9 +29,13 @@ public class SqlStatement {
 		public static String DELETE = "delete";
 		public static String FROM = "from";
 		public static String WHERECONDITION = "whereCondition";
+        public static String JOINCONDITION = "joinCondition";
+        public static String GROUPCONDITION = "groupCondition";
+        public static String ORDERCONDITION = "orderCondition";
 		public static String WHERE = "where";
 		public static String WHERENOT = "whereNot";
 		public static String AND = "and";
+		public static String NOT = "not";
 		public static String ANDNOT = "andNot";
 		public static String OR = "or";
 		public static String ORNOT = "orNot";
@@ -46,15 +50,35 @@ public class SqlStatement {
 		public static String FULLOUTERJOIN = "fullOuterJoin";
 		public static String ON = "on";
 	}
-	
+
+	public static class NUMERIC_FUNCTION {
+		public static String AVG = "avg";
+		public static String COUNT = "count";
+		public static String COS = "cos";
+		public static String SIN = "sin";
+		public static String SQRT = "sqrt";
+		public static String SUM = "sum";
+		public static String TAN = "tan";
+	}
+
+	@FunctionalInterface
+	interface BinaryFunction {
+		public void function(Object _lo, Object _ro);
+	}
+
+	@FunctionalInterface
+    interface UnaryFunction {
+	    public void function(Object _o);
+    }
+
 	protected static Map<String, OPERATOR> operatorMap = new HashMap<String, OPERATOR>();
 	public static enum OPERATOR {
 		PARENTHESIS_LEFT("("),
 		PARENTHESIS_RIGHT(")"),
 		COMMA(","),
-		AND("AND"),
-		OR("OR"),
-		NOT("NOT"),
+//		AND("AND"),
+//		OR("OR"),
+//		NOT("NOT"),
 		EQ("="),
 		LT("<"),
 		LE("<="),
@@ -111,6 +135,7 @@ public class SqlStatement {
 		private Map<String, Object> setMap = null;
 		private List<Object> deleteList = null;
 		private List<Object> whereList = null;
+		private List<Object> whereClause = null;
 		private Map<String,Object> whereMap = null;
 		private List<Object> colNames = null;
 		private List<Object> colValues = null;

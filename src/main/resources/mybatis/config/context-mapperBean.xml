@@ -24,8 +24,12 @@
 			</map>
 		</property>
 	</bean>
-	
-  	<bean id="mapperSimpleMySql" class="org.chronotics.db.mybatis.MapperMySql">
+
+	<bean id="mapperSimpleMySqlN" class="org.chronotics.db.mybatis.MapperMySqlN">
+		<property name="sqlSession" ref="sqlSessionSimpleMySql" />
+	</bean>
+
+	<bean id="mapperSimpleMySql" class="org.chronotics.db.mybatis.MapperMySql">
 		<property name="sqlSession" ref="sqlSessionSimpleMySql" />
 	</bean>
 	

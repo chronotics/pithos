@@ -1,71 +1,106 @@
 package org.chronotics.db.mybatis;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-
-import static org.chronotics.db.mybatis.SqlObject.FUNCTIONTYPE.UNARY;
 
 public class SqlObjectFunction extends SqlObject {
 
-    private String functionName="";
+    public static String SUM = "SUM";
+    public static String COUNT = "COUNT";
+    public static String PARENTHESES = "(";
+//    public class SUM {
+//        public SUM() {
+//            objectType = OBJECTTYPE.STATEMENT;
+//            name = SUM;
+//        }
+//    }
+//
+//    public class COUNT {
+//        public COUNT() {
+//            objectType = OBJECTTYPE.STATEMENT;
+//            name = COUNT;
+////            addChildObject(new SqlObjectValue<String>("ss"));
+//        }
+//    }
+//
+//    public class Parentheses {
+//        public Parentheses() {
+//            objectType = OBJECTTYPE.STATEMENT;
+//            name = PARENTHESES;
+//        }
+//    }
 
-    public class SUM {
-        public SUM() {
-            functionType = UNARY;
-            functionName = "SUM";
-        }
+    public SqlObjectFunction(String _name) {
+//        super(OBJECTTYPE.STATEMENT);
+        setType(OBJECTTYPE.STATEMENT);
+        setName(_name);
     }
 
-    public class COUNT {
-        public COUNT() {
-            functionType = UNARY;
-            functionName = "COUNT";
-        }
-    }
+//    private SqlObjectFunction(OBJECTTYPE _type) {
+//        super(_type);
+//    }
 
-    public class Parentheses {
-        public Parentheses() {
-            functionType = UNARY;
-            functionName = "(";
-        }
-    }
-
-    public SqlObjectFunction(SqlObject.FUNCTIONTYPE _type) {
-        super(_type);
-    }
-
-    @Override
-    public void addChildObject(SqlObject _obj) {
-
-    }
+//    @Override
+//    public void addChildObject(SqlObject _obj) {
+//
+//    }
 
     @Override
     public void build() {
-        Map<String, SqlObject> newChild = new LinkedHashMap<>();
-        newChild.put(
-                SqlObjectValue.class.getName(),
-                new SqlObjectValue<String>(this.functionName));
+//        Map<String, SqlObject> newChild = new LinkedHashMap<>();
+//
+//        newChild.put(SqlObjectCommand.class.getName(), new SqlObjectValue<String>(getName()));
+//
+//        int index = 0;
+//        for(Map.Entry<String, SqlObject> entry: childObjects.entrySet()) {
+//            newChild.put(entry.getKey(), entry.getValue());
+//
+//            if(index == 0) {
+//                newChild.put(
+//                        SqlObjectValue.class.getName(),
+//                        new SqlObjectValue<String>(PARENTHESES));
+//            }
+//            if (index == childObjects.size()-1) {
+//                break;
+//            }
+//
+//            if (name.equals(PARENTHESES)) {
+//                newChild.put(
+//                        SqlObjectValue.class.getName(),
+//                        new SqlObjectValue(KEYWORD.COMMA));
+//            } else {
+//
+//            }
+//            index++;
+//        }
+//
+//        newChild.put(
+//                SqlObjectValue.class.getName(),
+//                new SqlObjectValue<String>(")"));
+//
+//        childObjects.clear();
+//        childObjects.putAll(newChild);
 
-        int index = 0;
-        for(Map.Entry<String, SqlObject> entry: childObjects.entrySet()) {
-            newChild.put(entry.getKey(), entry.getValue());
-            if (index != childObjects.size()-1) {
-                switch (functionName) {
-                    case "(":
-                        newChild.put(
-                                SqlObjectValue.class.getName(),
-                                new SqlObjectValue(KEYWORD.COMMA));
-                        break;
-                }
+        List<SqlObject> newChildren = new ArrayList<>();
+        newChildren.add(new SqlObjectValue<String>(getName()));
+
+        for(int i = 0; i < childObjects.size(); i++) {
+            newChildren.add(childObjects.get(i));
+            if(i == 0 && !name.equals((PARENTHESES))) {
+                newChildren.add(new SqlObjectValue<String>(PARENTHESES));
             }
-            index++;
+            if(i == childObjects.size() - 1) {
+                break;
+            }
+            if(name.equals(PARENTHESES)) {
+                newChildren.add(new SqlObjectValue<String>(SqlObject.KEYWORD.COMMA));
+            } else {
+            }
         }
-
-        newChild.put(
-                SqlObjectValue.class.getName(),
-                new SqlObjectValue<String>(")"));
-
+        newChildren.add(new SqlObjectValue<String>(")"));
         childObjects.clear();
-        childObjects.putAll(newChild);
+        childObjects.addAll(newChildren);
     }
 }

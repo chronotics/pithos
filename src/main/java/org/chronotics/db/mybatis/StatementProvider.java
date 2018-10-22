@@ -33,7 +33,14 @@ public class StatementProvider {
 
     private Map<Object, Object> objectMap = new LinkedHashMap();
     public void addObject(SqlObject _obj) {
-        objectMap.put(_obj.getClass().getName(), _obj);
+        if(objectMap.isEmpty()) {
+           objectMap.put("STATEMENT", new ArrayList<>());
+        } else {
+
+        }
+        List<SqlObject> list = (List<SqlObject>) objectMap.get("STATEMENT");
+        list.add(_obj);
+//        objectMap.put(_obj.getClass().getName(), _obj);
     }
 
     public Map<Object,Object> getParameter() {
@@ -62,13 +69,6 @@ public class StatementProvider {
             for(SqlObject object: this.sqlObjects) {
                 provider.addObject(object);
             }
-
-//            provider.objectMap = this.objectMap
-//                    .entrySet()
-//                    .stream()
-//                    .collect(Collectors.toMap(
-//                            Map.Entry::getKey,
-//                            Map.Entry::getValue));
             provider.build();
 
             return provider;
@@ -83,17 +83,17 @@ public class StatementProvider {
         }
 
         public Builder select(SqlObject ..._objects) {
-            SqlObject sqlObject = new SqlObjectCommand(SqlObject.COMMANDTYPE.SELECT);
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);//(SqlObject.COMMANDTYPE.SELECT);
             return addChildren(sqlObject, _objects);
         }
 
         public Builder from(SqlObject ..._objects) {
-            SqlObject sqlObject = new SqlObjectCommand(SqlObject.COMMANDTYPE.FROM);
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FROM);
             return addChildren(sqlObject, _objects);
         }
 
         public Builder where(SqlObject ..._objects) {
-            SqlObject sqlObject = new SqlObjectCommand(SqlObject.COMMANDTYPE.WHERE);
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERE);
             return addChildren(sqlObject, _objects);
         }
     }

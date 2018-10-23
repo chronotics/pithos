@@ -26,7 +26,7 @@
 	</bean>
 
 	<bean id="mapperSimpleMySqlN" class="org.chronotics.db.mybatis.MapperMySqlN">
-		<property name="sqlSession" ref="sqlSessionSimpleMySql" />
+		<property name="sqlSession" ref="sqlSessionSimpleMySqlN" />
 	</bean>
 
 	<bean id="mapperSimpleMySql" class="org.chronotics.db.mybatis.MapperMySql">

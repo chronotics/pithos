@@ -19,7 +19,7 @@ public class TestStatementProvider {
     public ExpectedException exceptions = ExpectedException.none();
 
     @Resource(name = "mapperSimpleMySqlN")
-    private MapperMySql mapper;
+    private MapperMySqlN mapper;
 
     // table name
     public static String TABLE1 = "table1";
@@ -283,24 +283,24 @@ public class TestStatementProvider {
     }
     @Test
     public void testSingleInsert() throws Exception {
-        createTables();
-
-//        int resultCount = 0;
-//        resultCount = insertItemsOneByOne(TABLE1);
-//        assertEquals(itemCount, resultCount);
+//        createTables();
 //
-//        resultCount = insertItemsOneByOne(TABLE2);
-//        assertEquals(itemCount, resultCount);
+////        int resultCount = 0;
+////        resultCount = insertItemsOneByOne(TABLE1);
+////        assertEquals(itemCount, resultCount);
+////
+////        resultCount = insertItemsOneByOne(TABLE2);
+////        assertEquals(itemCount, resultCount);
+////
+////        this.deleteLikeName(TABLE1);
+////        this.deleteLikeName(TABLE2);
 //
-//        this.deleteLikeName(TABLE1);
-//        this.deleteLikeName(TABLE2);
-
-        dropTables();
+//        dropTables();
     }
 
     @Test
     public void testCustomSelect() throws Exception {
-        createTables();
+//        createTables();
 
 //        int resultCount = 0;
 //        resultCount = insertItemsOneByOne(TABLE1);
@@ -317,9 +317,14 @@ public class TestStatementProvider {
 
         StatementProvider provider = new StatementProvider
                 .Builder()
+                .select("*")
+                .from("user")
                 .build();
-        String statement = "* FROM table1.user";
-        mapper.selectWithStatement(statement);
+        Map<Object,Object> statementMap = provider.getStatementMap();
+
+        List<Map<String,Object>> result = mapper.selectList(statementMap);
+        System.out.println(result);
+
 
         dropTables();
     }

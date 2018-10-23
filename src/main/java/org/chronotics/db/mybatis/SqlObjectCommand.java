@@ -68,46 +68,24 @@ public class SqlObjectCommand extends SqlObject {
 //    }
 
     @Override
-    public void build() {
-//        Map<String, SqlObject> newChild = new LinkedHashMap<>();
-//
-//        int index = 0;
-//        for(Map.Entry<String, SqlObject> entry: childObjects.entrySet()) {
-//            newChild.put(entry.getKey(), entry.getValue());
-//            if (index == childObjects.size()-1) {
-//                break;
-//            }
-//
-//            if (name.equals(SELECT) ||
-//                    name.equals(FROM)) {
-//                newChild.put(
-//                        SqlObjectValue.class.getName(),
-//                        new SqlObjectValue(KEYWORD.COMMA));
-//            } else {
-//            }
-//
-//            index++;
-//        }
-//
-//        childObjects.clear();
-//        childObjects.putAll(newChild);
-
-        List<SqlObject> newChildren = new ArrayList<>();
-        newChildren.add(new SqlObjectValue<String>(getName()));
+    public void build(List<Object> _statement) {
+        // insert Command
+//        _statement.add(new SqlObjectValue<>(getName()));
+        _statement.add(new String(getName()));
 
         for(int i = 0; i < childObjects.size(); i++) {
-            newChildren.add(childObjects.get(i));
+            SqlObject object = childObjects.get(i);
+            object.build(_statement);
             if(i == childObjects.size() - 1) {
                 break;
             }
+            // insert "," in the case of SELECT or FROM
             if(name.equals(SELECT) ||
                     name.equals(FROM)) {
-                newChildren.add(new SqlObjectValue<String>(KEYWORD.COMMA));
+//                _statement.add(new SqlObjectValue<>(COMMA));
+                _statement.add(new String(COMMA));
             } else {
-
             }
         }
-        childObjects.clear();
-        childObjects.addAll(newChildren);
     }
 }

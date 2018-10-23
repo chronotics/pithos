@@ -1,5 +1,7 @@
 package org.chronotics.db.mybatis;
 
+import java.util.List;
+
 public class SqlObjectValue<T> extends SqlObject {
 //    SqlObjectValue(SqlObject.VALUETYPE _type) {
 //        super(_type);
@@ -16,14 +18,12 @@ public class SqlObjectValue<T> extends SqlObject {
 //    }
 
     SqlObjectValue(T _object) {
-//        super(OBJECTTYPE.STATEMENT);
-
         if(_object instanceof String) {
             setType(OBJECTTYPE.STATEMENT);
         } else {
             setType(OBJECTTYPE.VARIABLE);
         }
-        value = (T) _object;
+        value = (T)_object;
     }
 
     @Override
@@ -32,6 +32,12 @@ public class SqlObjectValue<T> extends SqlObject {
     }
 
     @Override
-    public void build() {
+    public void build(List<Object> _statement) {
+        _statement.add(value);
+//        if(value instanceof String) {
+//            _statement.add(new String(value));
+//        } else {
+//            _statement.add(value);
+//        }
     }
 }

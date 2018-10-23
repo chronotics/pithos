@@ -9,7 +9,7 @@ public class SqlObjectFunction extends SqlObject {
 
     public static String SUM = "SUM";
     public static String COUNT = "COUNT";
-    public static String PARENTHESES = "(";
+    public static String PARENTHESIS = "(";
 //    public class SUM {
 //        public SUM() {
 //            objectType = OBJECTTYPE.STATEMENT;
@@ -48,59 +48,30 @@ public class SqlObjectFunction extends SqlObject {
 //    }
 
     @Override
-    public void build() {
-//        Map<String, SqlObject> newChild = new LinkedHashMap<>();
-//
-//        newChild.put(SqlObjectCommand.class.getName(), new SqlObjectValue<String>(getName()));
-//
-//        int index = 0;
-//        for(Map.Entry<String, SqlObject> entry: childObjects.entrySet()) {
-//            newChild.put(entry.getKey(), entry.getValue());
-//
-//            if(index == 0) {
-//                newChild.put(
-//                        SqlObjectValue.class.getName(),
-//                        new SqlObjectValue<String>(PARENTHESES));
-//            }
-//            if (index == childObjects.size()-1) {
-//                break;
-//            }
-//
-//            if (name.equals(PARENTHESES)) {
-//                newChild.put(
-//                        SqlObjectValue.class.getName(),
-//                        new SqlObjectValue(KEYWORD.COMMA));
-//            } else {
-//
-//            }
-//            index++;
-//        }
-//
-//        newChild.put(
-//                SqlObjectValue.class.getName(),
-//                new SqlObjectValue<String>(")"));
-//
-//        childObjects.clear();
-//        childObjects.putAll(newChild);
-
-        List<SqlObject> newChildren = new ArrayList<>();
-        newChildren.add(new SqlObjectValue<String>(getName()));
+    public void build(List<Object> _statement) {
+        // insert Function
+//        _statement.add(new SqlObjectValue<>(getName()));
+        _statement.add(new String(getName()));
 
         for(int i = 0; i < childObjects.size(); i++) {
-            newChildren.add(childObjects.get(i));
-            if(i == 0 && !name.equals((PARENTHESES))) {
-                newChildren.add(new SqlObjectValue<String>(PARENTHESES));
+            SqlObject object = childObjects.get(i);
+            object.build(_statement);
+            // insert ( for general Function, ex) COUNT"("
+            if(i == 0 && !name.equals((PARENTHESIS))) {
+//                _statement.add(new SqlObjectValue<>(LPARENTHESIS));
+                _statement.add(new String(LPARENTHESIS));
             }
             if(i == childObjects.size() - 1) {
                 break;
             }
-            if(name.equals(PARENTHESES)) {
-                newChildren.add(new SqlObjectValue<String>(SqlObject.KEYWORD.COMMA));
+            if(name.equals(PARENTHESIS)) {
+//                _statement.add(new SqlObjectValue<>(COMMA));
+                _statement.add(new String(COMMA));
             } else {
             }
         }
-        newChildren.add(new SqlObjectValue<String>(")"));
-        childObjects.clear();
-        childObjects.addAll(newChildren);
+        // insert ) for all Function
+//        _statement.add(new SqlObjectValue<>(RPARENTHESIS));
+        _statement.add(new String(RPARENTHESIS));
     }
 }

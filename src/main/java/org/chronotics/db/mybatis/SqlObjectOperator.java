@@ -13,7 +13,7 @@ public class SqlObjectOperator extends SqlObject {
     public static String NE = "<>";
     public static String GE = ">=";
     public static String GT = ">";
-    public static String BETWEEN = "BETWEEDN";
+    public static String BETWEEN = "BETWEEN";
     public static String LIKE = "LIKE";
     public static String IN = "IN";
 
@@ -45,7 +45,7 @@ public class SqlObjectOperator extends SqlObject {
 //    }
 
     @Override
-    public void build() {
+    public void build(List<Object> _statement) {
         if(getName().equals(EQ) ||
                 getName().equals(LT) ||
                 getName().equals(LE) ||
@@ -65,52 +65,39 @@ public class SqlObjectOperator extends SqlObject {
             assert(childObjects.size() >= 2); // LEFT and RIGHT(many)
         }
 
-//        Map<String, SqlObject> newChild = new LinkedHashMap<>();
-//
-//        int index = 0;
-//        for(Map.Entry<String, SqlObject> entry: childObjects.entrySet()) {
-//            newChild.put(entry.getKey(), entry.getValue());
-//            if(index == 0) {
-//            }
-//            if (index == childObjects.size()-1) {
-//                break;
-//            }
-//
-//            index++;
-//        }
-//
-//
-//        childObjects.clear();
-//        childObjects.putAll(newChild);
-
-        List<SqlObject> newChildren = new ArrayList<>();
-
         if(name.equals(IN)) {
-            newChildren.add(new SqlObjectValue<String>(getName()));
-            newChildren.add(new SqlObjectValue<String>("("));
+            _statement.add(new SqlObjectValue<>(getName()));
+            _statement.add(new SqlObjectValue<>(LPARENTHESIS));
             for(int i = 0; i < childObjects.size(); i++) {
-                newChildren.add(childObjects.get(i));
+                SqlObject object = childObjects.get(i);
+                object.build(_statement);
                 if(i == childObjects.size() - 1) {
                     break;
                 }
-                newChildren.add(new SqlObjectValue<String>(KEYWORD.COMMA));
+                _statement.add(new SqlObjectValue<>(COMMA));
             }
-            newChildren.add(new SqlObjectValue<String>(")"));
+            _statement.add(new SqlObjectValue<>(RPARENTHESIS));
         } else {
             for(int i = 0; i < childObjects.size(); i++) {
-                newChildren.add(childObjects.get(i));
+                SqlObject object = childObjects.get(i);
+                // i = 0 : LEFT OPERAND
+                // i = 1 : OPERATOR
+                // i >= 2 : RIGHT OPERAND
                 if(i == 0) {
-                    newChildren.add(new SqlObjectValue<String>(getName()));
+                    // insert LEFT OPERAND
+                    object.build(_statement);
+                    // insert OPERATOR
+                    _statement.add(new SqlObjectValue<>(getName()));
+                } else {
+                    object.build(_statement);
                 }
                 if(i == childObjects.size() - 1) {
                     break;
                 }
                 if((i == childObjects.size()-2) && name.equals(BETWEEN) ) {
-                   newChildren.add(new SqlObjectValue<String>("AND"));
+                    _statement.add(new SqlObjectValue<>(AND));
                 }
             }
         }
-        childObjects.clear();
-        childObjects.addAll(newChildren);
     }
 }

@@ -7,9 +7,10 @@ import java.util.Map;
 
 public abstract class SqlObject {
 
-    public static class KEYWORD {
-        public static String COMMA = ",";
-    }
+    public static String COMMA = ",";
+    public static String LPARENTHESIS = "(";
+    public static String RPARENTHESIS = ")";
+    public static String AND = "AND";
 
     public static enum OBJECTTYPE {
 //        COMMAND("COMMAND"),
@@ -187,5 +188,5 @@ public abstract class SqlObject {
         childObjects.add(_obj); //.put(_obj.getClass().getName(), _obj);
     }
 
-    public abstract void build();
+    public abstract void build(List<Object> _list);
 }

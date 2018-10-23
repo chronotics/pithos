@@ -25,7 +25,7 @@ public class MapperMySqlN implements IMapperN {
 		return className;
 	}
 	
-	@Resource(name = "sqlSessionSimpleMySql")
+	@Resource(name = "sqlSessionSimpleMySqlN")
 	private SqlSession sqlSession;
 	
 	public SqlSession getSqlSession() {
@@ -36,122 +36,50 @@ public class MapperMySqlN implements IMapperN {
 		sqlSession = _sqlSession;
 	}
 	
-	@Override
-	public Map<String, Object> selectOne(Map<Object, Object> parameter) {
-		return getSqlSession().selectOne(
-				getClassName() + ".selectOne", 
-				parameter);
-	}
+//	@Override
+//	public int generalStatement(Map<Object, Object> _statementMap) throws Exception {
+//		return getSqlSession().update(
+//				getClassName() + ".generalStatement",
+//				_statementMap);
+//	}
 
 	@Override
-	public Map<String, Object> selectOne(StatementProvider provider) throws Exception {
+	public Map<String, Object> selectOne(Map<Object, Object> _statementMap) {
 		return getSqlSession().selectOne(
 				getClassName() + ".selectOne",
-				provider.getParameter());
+				_statementMap);
 	}
 
 	@Override
-	public List<Map<String, Object>> selectList(Map<Object, Object> parameter) {
+	public List<Map<String, Object>> selectList(Map<Object, Object> _statementMap) {
 		return getSqlSession().selectList(
 				getClassName() + ".selectList",
-				parameter);
+				_statementMap);
 	}
 
 	@Override
-	public List<Map<String,Object>> selectList(StatementProvider provider) throws Exception {
-		return getSqlSession().selectList(
-				getClassName() + ".selectList",
-				provider.getParameter());
-	}
-	
-	@Override
-	public List<Map<String,Object>> selectWithStatement(String statement) {
-		return getSqlSession().selectList(statement);
-	}
-
-	@Override
-	public int insert(Map<Object, Object> parameter) {
+	public int insert(Map<Object, Object> _statementMap) {
 		return getSqlSession().insert(
 				getClassName() + ".insert",
-				parameter);
+				_statementMap);
 	}
 
 	@Override
-	public int insert(StatementProvider provider) throws Exception {
-		return getSqlSession().insert(
-				getClassName() + ".insert",
-				provider.getParameter());
-	}
-	
-	@Override
-	public int insertWithStatement(String statement) {
-		return getSqlSession().insert(statement);
-	}
-	
-	@Override
-	public int update(Map<Object, Object> parameter) {
-		return getSqlSession().update(
-				getClassName() + ".update", 
-				parameter);
-	}
-
-	@Override
-	public int update(StatementProvider provider) throws Exception {
+	public int update(Map<Object, Object> _statementMap) {
 		return getSqlSession().update(
 				getClassName() + ".update",
-				provider.getParameter());
-	}
-	
-	@Override
-	public int updateWithStatement(String statement) {
-		return getSqlSession().update(statement);
+				_statementMap);
 	}
 
 	@Override
-	public int delete(Map<Object, Object> parameter) {
+	public int delete(Map<Object, Object> _statementMap) {
 		return getSqlSession().delete(
-				getClassName() + ".delete", 
-				parameter);
+				getClassName() + ".delete",
+				_statementMap);
 	}
 
 	@Override
-	public int delete(StatementProvider provider) throws Exception {
-		return getSqlSession().delete(
-				getClassName() + ".delete", 
-				provider.getParameter());
+	public int insertMultipleItems(Map<Object, Object> _statementMaps) {
+		return 0;
 	}
-		
-	@Override
-	public int deleteWithStatement(String statement) {
-		return this.deleteWithStatement(statement);
-	}
-
-	@Override
-	public int insertMultipleItems(Map<Object,Object> parameters) {
-		return getSqlSession().insert(
-				getClassName() + ".insertMultipleItems", 
-				parameters);
-	}
-
-	@Override
-	public int insertMultipleItems(StatementProvider provider) throws Exception {
-		return getSqlSession().insert(
-				getClassName() + ".insertMultipleItems", //sqlstatement.getMapperStatement(),
-				provider.getParameter());
-	}
-	
-	@Override
-	public int doStatement(Map<Object,Object> parameters) {
-		return getSqlSession().update(
-				getClassName() + ".doStatement", 
-				parameters);
-	}
-
-	@Override
-	public int doStatement(StatementProvider provider) throws Exception {
-		return getSqlSession().update(
-				getClassName() + ".doStatement", 
-				provider.getParameter());
-	}
-	
 }

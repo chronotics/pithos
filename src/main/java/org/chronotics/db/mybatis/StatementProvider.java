@@ -31,27 +31,31 @@ public class StatementProvider {
         public static String TAN = "tan";
     }
 
+    public static String STATEMENT = "STATEMENT";
+
     private Map<Object, Object> objectMap = new LinkedHashMap();
+    private List<SqlObject> sqlObjectList = new ArrayList<>();
+
     public void addObject(SqlObject _obj) {
-        if(objectMap.isEmpty()) {
-           objectMap.put("STATEMENT", new ArrayList<>());
-        } else {
-
-        }
-        List<SqlObject> list = (List<SqlObject>) objectMap.get("STATEMENT");
-        list.add(_obj);
-//        objectMap.put(_obj.getClass().getName(), _obj);
+        sqlObjectList.add(_obj);
     }
 
-    public Map<Object,Object> getParameter() {
-        return objectMap;
-    }
+//    public Map<Object,Object> getParameter() {
+//        return objectMap;
+//    }
 
     private void build() {
-        for(Map.Entry<Object,Object> entry: objectMap.entrySet()) {
-            SqlObject sqlObject = (SqlObject)entry.getValue();
-            sqlObject.build();
-        }
+        List<Object> buildList = new ArrayList<>();
+        sqlObjectList.forEach(object -> {
+           object.build(buildList);
+        });
+
+        objectMap.clear();
+        objectMap.put(STATEMENT, new ArrayList<>(buildList));
+    }
+
+    public Map<Object,Object> getStatementMap() {
+        return objectMap;
     }
 
     public static class Builder {
@@ -83,8 +87,13 @@ public class StatementProvider {
         }
 
         public Builder select(SqlObject ..._objects) {
-            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);//(SqlObject.COMMANDTYPE.SELECT);
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);
             return addChildren(sqlObject, _objects);
+        }
+
+        public Builder select(String ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);
+            return addChildren(sqlObject, new SqlObjectValue<>(_objects));
         }
 
         public Builder from(SqlObject ..._objects) {
@@ -92,9 +101,19 @@ public class StatementProvider {
             return addChildren(sqlObject, _objects);
         }
 
+        public Builder from(String ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FROM);
+            return addChildren(sqlObject, new SqlObjectValue<>(_objects));
+        }
+
         public Builder where(SqlObject ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERE);
             return addChildren(sqlObject, _objects);
+        }
+
+        public Builder where(String ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERE);
+            return addChildren(sqlObject, new SqlObjectValue<>(_objects));
         }
     }
 

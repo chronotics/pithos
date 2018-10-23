@@ -15,7 +15,13 @@
         http://www.springframework.org/schema/task/spring-task.xsd
 		http://www.springframework.org/schema/util 
         http://www.springframework.org/schema/util/spring-util.xsd">
-	
+
+	<bean id="sqlSessionSimpleMySqlN" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactoryBeanMySql" />
+		<constructor-arg name="executorType" value="SIMPLE" />
+		<constructor-arg name="exceptionTranslator" ref="persistenceExceptionTranslator" />
+	</bean>
+
   	<bean id="sqlSessionSimpleMySql" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
 		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactoryBeanMySql" />
 		<constructor-arg name="executorType" value="SIMPLE" />

@@ -281,22 +281,22 @@ public class TestStatementProvider {
             itemSet2.add(item);
         }
     }
-    @Test
-    public void testSingleInsert() throws Exception {
-//        createTables();
-//
-////        int resultCount = 0;
-////        resultCount = insertItemsOneByOne(TABLE1);
-////        assertEquals(itemCount, resultCount);
+//    @Test
+//    public void testSingleInsert() throws Exception {
+////        createTables();
 ////
-////        resultCount = insertItemsOneByOne(TABLE2);
-////        assertEquals(itemCount, resultCount);
+//////        int resultCount = 0;
+//////        resultCount = insertItemsOneByOne(TABLE1);
+//////        assertEquals(itemCount, resultCount);
+//////
+//////        resultCount = insertItemsOneByOne(TABLE2);
+//////        assertEquals(itemCount, resultCount);
+//////
+//////        this.deleteLikeName(TABLE1);
+//////        this.deleteLikeName(TABLE2);
 ////
-////        this.deleteLikeName(TABLE1);
-////        this.deleteLikeName(TABLE2);
-//
-//        dropTables();
-    }
+////        dropTables();
+//    }
 
     @Test
     public void testCustomSelect() throws Exception {
@@ -315,9 +315,10 @@ public class TestStatementProvider {
 ////
 ////        mapper.doStatement(sqlStatement);
 
+        Integer i = new Integer(1);
         StatementProvider provider = new StatementProvider
                 .Builder()
-                .select("*")
+                .select(i)
                 .from("user")
                 .build();
         Map<Object,Object> statementMap = provider.getStatementMap();

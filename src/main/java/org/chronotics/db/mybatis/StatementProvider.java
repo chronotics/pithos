@@ -78,42 +78,43 @@ public class StatementProvider {
             return provider;
         }
 
-        private Builder addChildren(SqlObject _sqlObject, SqlObject ..._objects) {
-            for(SqlObject object: _objects) {
-                _sqlObject.addChildObject(object);
+        private Builder addChildren(SqlObject _sqlObject, Object ..._objects) {
+            for(Object object: _objects) {
+                SqlObject sqlObject = SqlObjectValue.create(object);
+                _sqlObject.addChildObject(sqlObject);
             }
             this.sqlObjects.add(_sqlObject);
             return this;
         }
 
-        public Builder select(SqlObject ..._objects) {
+//        public Builder select(SqlObject ..._objects) {
+//            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);
+//            return addChildren(sqlObject, _objects);
+//        }
+
+        public Builder select(Object ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);
             return addChildren(sqlObject, _objects);
         }
 
-        public Builder select(String ..._objects) {
-            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);
-            return addChildren(sqlObject, new SqlObjectValue<>(_objects));
-        }
+//        public Builder from(SqlObject ..._objects) {
+//            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FROM);
+//            return addChildren(sqlObject, _objects);
+//        }
 
-        public Builder from(SqlObject ..._objects) {
+        public Builder from(Object ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FROM);
             return addChildren(sqlObject, _objects);
         }
 
-        public Builder from(String ..._objects) {
-            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FROM);
-            return addChildren(sqlObject, new SqlObjectValue<>(_objects));
-        }
+//        public Builder where(SqlObject ..._objects) {
+//            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERE);
+//            return addChildren(sqlObject, _objects);
+//        }
 
-        public Builder where(SqlObject ..._objects) {
+        public Builder where(Object ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERE);
             return addChildren(sqlObject, _objects);
-        }
-
-        public Builder where(String ..._objects) {
-            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERE);
-            return addChildren(sqlObject, new SqlObjectValue<>(_objects));
         }
     }
 

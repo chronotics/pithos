@@ -13,13 +13,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertTrue;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {org.chronotics.pithos.Application.class})
 public class TestStatementProvider {
     public ExpectedException exceptions = ExpectedException.none();
 
-    @Resource(name = "mapperSimpleMySqlN")
-    private MapperMySqlN mapper;
+    @Resource(name = "mapperSimpleStatementProvider")
+    private MapperStatementProvider mapper;
 
     // table name
     public static String TABLE1 = "table1";
@@ -46,208 +48,75 @@ public class TestStatementProvider {
             new ArrayList<Map<String,Object>>();
 
     private void createTables() {
-//        dropTables();
-//        {
-//            String statement=
-//                    "CREATE TABLE "+ TABLE1 +" (" +
-//                            "	c0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
-//                            "	c1 VARCHAR(255) NULL," +
-//                            "	c2 VARCHAR(255) NULL," +
-//                            "	c3 FLOAT NULL default '0'," +
-//                            "	c4 VARBINARY(255) NULL," +
-//                            "	c5 BLOB NULL," +
-//                            "	c6 TEXT NULL," +
-//                            "	c7 DATE NULL," +
-//                            "	c8 TIME NULL," +
-//                            "	c9 TIMESTAMP(6) NULL," +
-//                            "	PRIMARY KEY (c0)" +
-//                            ");";
-//            Map<Object,Object> sqlStatement = new LinkedHashMap<Object,Object>();
-//            sqlStatement.put(KEYWORD.STATEMENT,statement);
-//            mapper.doStatement(sqlStatement);
-//        }
-//        {
-//            String statement=
-//                    "CREATE TABLE "+ TABLE2 +" (" +
-//                            "	c0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
-//                            "	c1 VARCHAR(255) NULL," +
-//                            "	c2 VARCHAR(255) NULL," +
-//                            "	c3 FLOAT NULL default '0'," +
-//                            "	c4 VARBINARY(255) NULL," +
-//                            "	c5 BLOB NULL," +
-//                            "	c6 TEXT NULL," +
-//                            "	c7 DATE NULL," +
-//                            "	c8 TIME NULL," +
-//                            "	c9 TIMESTAMP(6) NULL," +
-//                            "	PRIMARY KEY (c0)" +
-//                            ");";
-//            Map<Object,Object> sqlStatement = new LinkedHashMap<Object,Object>();
-//            sqlStatement.put(KEYWORD.STATEMENT,statement);
-//            mapper.doStatement(sqlStatement);
-//        }
+        dropTables();
+        {
+            String statement=
+                    "CREATE TABLE "+ TABLE1 +" (" +
+                            "	c0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
+                            "	c1 VARCHAR(255) NULL," +
+                            "	c2 VARCHAR(255) NULL," +
+                            "	c3 FLOAT NULL default '0'," +
+                            "	c4 VARBINARY(255) NULL," +
+                            "	c5 BLOB NULL," +
+                            "	c6 TEXT NULL," +
+                            "	c7 DATE NULL," +
+                            "	c8 TIME NULL," +
+                            "	c9 TIMESTAMP(6) NULL," +
+                            "	PRIMARY KEY (c0)" +
+                            ");";
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .doStatement(statement)
+                    .build();
+            Map<Object,Object> statementMap = provider.getStatementMap();
+            mapper.doStatement(statementMap);
+        }
+        {
+            String statement=
+                    "CREATE TABLE "+ TABLE2 +" (" +
+                            "	c0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
+                            "	c1 VARCHAR(255) NULL," +
+                            "	c2 VARCHAR(255) NULL," +
+                            "	c3 FLOAT NULL default '0'," +
+                            "	c4 VARBINARY(255) NULL," +
+                            "	c5 BLOB NULL," +
+                            "	c6 TEXT NULL," +
+                            "	c7 DATE NULL," +
+                            "	c8 TIME NULL," +
+                            "	c9 TIMESTAMP(6) NULL," +
+                            "	PRIMARY KEY (c0)" +
+                            ");";
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .doStatement(statement)
+                    .build();
+            Map<Object,Object> statementMap = provider.getStatementMap();
+            mapper.doStatement(statementMap);
+        }
     }
 
     private void dropTables() {
-//        {
-//            String statement=
-//                    "DROP TABLE IF EXISTS " + TABLE1;
-//            Map<Object,Object> sqlStatement = new LinkedHashMap<Object,Object>();
-//            sqlStatement.put(KEYWORD.STATEMENT,statement);
-//            mapper.doStatement(sqlStatement);
-//        }
-//        {
-//            String statement=
-//                    "DROP TABLE IF EXISTS " + TABLE2;
-//            Map<Object,Object> sqlStatement = new LinkedHashMap<Object,Object>();
-//            sqlStatement.put(KEYWORD.STATEMENT,statement);
-//            mapper.doStatement(sqlStatement);
-//        }
+        {
+            String statement=
+                    "DROP TABLE IF EXISTS " + TABLE1;
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .doStatement(statement)
+                    .build();
+            Map<Object,Object> statementMap = provider.getStatementMap();
+            mapper.doStatement(statementMap);
+        }
+        {
+            String statement=
+                    "DROP TABLE IF EXISTS " + TABLE2;
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .doStatement(statement)
+                    .build();
+            Map<Object,Object> statementMap = provider.getStatementMap();
+            mapper.doStatement(statementMap);
+        }
     }
-
-//    private int insertMultipleItems(String _tableName) throws Exception {
-//        List<Map<String,Object>> itemSet;
-//        if(_tableName == TABLE1) {
-//            itemSet = itemSet1;
-//        } else if (_tableName == TABLE2) {
-//            itemSet = itemSet2;
-//        } else {
-//            assert(false);
-//            return 0;
-//        }
-//
-//        List<Object> colNames = new ArrayList<Object>();
-//        colNames.add(CSTR1);
-//        colNames.add(CSTR2);
-//        colNames.add(CNUMBER);
-//        // binary
-//        // blob
-//        // clob
-//        colNames.add(CDATE);
-//        colNames.add(CTIME);
-//        colNames.add(CTIMESTAMP);
-//
-//        List<List<Object>> records = new ArrayList<List<Object>>();
-//        for(Map<String,Object> entry : itemSet) {
-//            List<Object> variables = new ArrayList<Object>();
-//
-//            String str1 = (String) entry.get(CSTR1);
-//            String str2 = (String) entry.get(CSTR2);
-//            Object number = entry.get(CNUMBER);
-//            // binary
-//            // blob
-//            // clob
-//            Object date = entry.get(CDATE);
-//            Object time = entry.get(CTIME);
-//            Object timestamp = entry.get(CTIMESTAMP);
-//
-//            variables.add(str1);
-//            variables.add(str2);
-//            variables.add(number);
-//            // binary
-//            // blob
-//            // clob
-//            variables.add(date);
-//            variables.add(time);
-//            variables.add(timestamp);
-//
-//            records.add(variables);
-//        }
-//
-//        Map<Object,Object> sqlStatement = new LinkedHashMap<Object,Object>();
-//
-//        List<Object> insert = new ArrayList<Object>();
-//        insert.add(_tableName);
-//
-//        sqlStatement.put(COMMAND.INSERT, insert);
-//        sqlStatement.put(KEYWORD.COLNAMES, colNames);
-//        sqlStatement.put(KEYWORD.RECORDS, records);
-//
-//        return mapper.insertMultipleItems(sqlStatement);
-//    }
-//
-//    private int insertItemsOneByOne(String _tableName) throws Exception {
-//        List<Map<String,Object>> itemSet;
-//        if(_tableName == TABLE1) {
-//            itemSet = itemSet1;
-//        } else if (_tableName == TABLE2) {
-//            itemSet = itemSet2;
-//        } else {
-//            return 0;
-//        }
-//
-//        int totalInsertion = 0;
-//        // insert
-//        for(Map<String,Object> entry : itemSet) {
-//            String str1 = (String) entry.get(CSTR1);
-//            String str2 = (String) entry.get(CSTR2);
-//            Object number = entry.get(CNUMBER);
-//            // binary
-//            // blob
-//            // clob
-//            Object date = entry.get(CDATE);
-//            Object time = entry.get(CTIME);
-//            Object timestamp = entry.get(CTIMESTAMP);
-//
-//            // old method
-//            Map<Object,Object> sqlStatement = new LinkedHashMap<Object,Object>();
-//
-//            List<Object> insert = new ArrayList<Object>();
-//            insert.add(_tableName);
-//
-//            List<Object> colNames = new ArrayList<Object>();
-//            colNames.add(CSTR1);
-//            colNames.add(CSTR2);
-//            colNames.add(CNUMBER);
-//            // binary
-//            // blob
-//            // clob
-//            colNames.add(CDATE);
-//            colNames.add(CTIME);
-//            colNames.add(CTIMESTAMP);
-//
-//            List<Object> colValues = new ArrayList<Object>();
-//            colValues.add(str1);
-//            colValues.add(str2);
-//            colValues.add(number);
-//            // binary
-//            // blob
-//            // clob
-//            colValues.add(date);
-//            colValues.add(time);
-//            colValues.add(timestamp);
-//
-//            sqlStatement.put(COMMAND.INSERT, insert);
-//            sqlStatement.put(KEYWORD.COLNAMES, colNames);
-//            sqlStatement.put(KEYWORD.COLVALUES, colValues);
-//
-//            int count = mapper.insert(sqlStatement);
-//            totalInsertion += count;
-//        }
-//
-//        return totalInsertion;
-//    }
-//
-//    private int deleteLikeName(String _tableName) throws Exception {
-//        Map<Object,Object> sqlStatement = new LinkedHashMap<Object,Object>();
-//
-//        List<Object> delete = new ArrayList<Object>();
-//        delete.add(_tableName);
-//
-//        List<Object> where = new ArrayList<Object>();
-//        where.add(CSTR1);
-//        where.add(OPERATOR.LIKE);
-//        where.add(SqlStatement.toVV("%"));
-//
-//        Map<String,Object> whereCondition = new LinkedHashMap<String,Object>();
-//        whereCondition.put(COMMAND.WHERE, where);
-//
-//        sqlStatement.put(COMMAND.DELETE, delete);
-//        sqlStatement.put(COMMAND.WHERECONDITION, whereCondition);
-//
-//        int result = mapper.delete(sqlStatement);
-//
-//        return result;
-//    }
 
     @BeforeClass
     public static void setup() {
@@ -281,22 +150,20 @@ public class TestStatementProvider {
             itemSet2.add(item);
         }
     }
-//    @Test
-//    public void testSingleInsert() throws Exception {
-////        createTables();
-////
-//////        int resultCount = 0;
-//////        resultCount = insertItemsOneByOne(TABLE1);
-//////        assertEquals(itemCount, resultCount);
-//////
-//////        resultCount = insertItemsOneByOne(TABLE2);
-//////        assertEquals(itemCount, resultCount);
-//////
-//////        this.deleteLikeName(TABLE1);
-//////        this.deleteLikeName(TABLE2);
-////
-////        dropTables();
-//    }
+
+    @Test
+    public void testCustomStatement() throws Exception {
+//        StatementProvider provider = new StatementProvider
+//                .Builder()
+//                .doStatement("SELECT * FROM bp")
+//                .build();
+//        Map<Object,Object> statementMap = provider.getStatementMap();
+//
+//        int result = mapper.doStatement(statementMap);
+//        assertTrue(result != 0);
+
+        createTables();
+    }
 
     @Test
     public void testCustomSelect() throws Exception {
@@ -315,15 +182,25 @@ public class TestStatementProvider {
 ////
 ////        mapper.doStatement(sqlStatement);
 
+//        SqlObject eqCondition = new SqlObjectOperator(SqlObjectOperator.EQ);
+//        eqCondition.addChildObject("hbp",120);
         Integer i = new Integer(1);
         StatementProvider provider = new StatementProvider
                 .Builder()
-                .select(i)
-                .from("user")
+                .select("hbp", "lbp")
+                .from("bp")
+                .where(new SqlObjectOperator(SqlObjectOperator.EQ)
+                    .put("hbp",120))
+                .and(new SqlObjectOperator(SqlObjectOperator.EQ)
+                        .put("lbp",90))
+                .orderby("hbp", "lbp")
+                .desc()
+                .limit(1)
                 .build();
         Map<Object,Object> statementMap = provider.getStatementMap();
 
         List<Map<String,Object>> result = mapper.selectList(statementMap);
+        assertTrue(result.size() != 0);
         System.out.println(result);
 
 

@@ -25,8 +25,12 @@
 		</property>
 	</bean>
 
-	<bean id="mapperSimpleMySqlN" class="org.chronotics.db.mybatis.MapperMySqlN">
-		<property name="sqlSession" ref="sqlSessionSimpleMySqlN" />
+	<bean id="mapperSimpleStatementProvider" class="org.chronotics.db.mybatis.MapperStatementProvider">
+		<property name="sqlSession" ref="sqlSessionSimpleStatementProvider" />
+	</bean>
+
+	<bean id="mapperBatchStatementProvider" class="org.chronotics.db.mybatis.MapperStatementProvider">
+		<property name="sqlSession" ref="sqlSessionBatchStatementProvider" />
 	</bean>
 
 	<bean id="mapperSimpleMySql" class="org.chronotics.db.mybatis.MapperMySql">

@@ -19,18 +19,19 @@ import java.util.Map;
  * SELECT ${statement}
  */
 
-public interface IMapperN {
+public interface IMapperStatementProvider {
 
-	public Map<String,Object> selectOne(Map<Object, Object> _statementMap);
+	Map<String,Object> selectOne(Map<Object, Object> _statementMap);
 
-	public List<Map<String,Object>> selectList(Map<Object, Object> _statementMap);
+	List<Map<String,Object>> selectList(Map<Object, Object> _statementMap);
 
-	public int insert(Map<Object, Object> _statementMap);
+	int insert(Map<Object, Object> _statementMap);
 
-	public int update(Map<Object, Object> _statementMap);
+	int update(Map<Object, Object> _statementMap);
 
-	public int delete(Map<Object, Object> _statementMap);
+	int delete(Map<Object, Object> _statementMap);
 
-	public int insertMultipleItems(Map<Object, Object> _statementMaps);
+	int insertMultipleItems(Map<Object, Object> _statementMaps);
 
+	int doStatement(Map<Object, Object> _statementMap);
 }

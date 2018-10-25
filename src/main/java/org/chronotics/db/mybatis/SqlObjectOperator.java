@@ -32,7 +32,7 @@ public class SqlObjectOperator extends SqlObject {
 //    }
 
     public SqlObjectOperator(String _name) {
-        setType(OBJECTTYPE.STATEMENT);
+//        setType(OBJECTTYPE.STATEMENT);
         setName(_name);
     }
 //    private SqlObjectOperator(OBJECTTYPE _type) {
@@ -66,17 +66,17 @@ public class SqlObjectOperator extends SqlObject {
         }
 
         if(name.equals(IN)) {
-            _statement.add(new SqlObjectValue(getName()));
-            _statement.add(new SqlObjectValue(LPARENTHESIS));
+            _statement.add(getName());
+            _statement.add(LPARENTHESIS);
             for(int i = 0; i < childObjects.size(); i++) {
                 SqlObject object = childObjects.get(i);
                 object.build(_statement);
                 if(i == childObjects.size() - 1) {
                     break;
                 }
-                _statement.add(new SqlObjectValue(COMMA));
+                _statement.add(COMMA);
             }
-            _statement.add(new SqlObjectValue(RPARENTHESIS));
+            _statement.add(RPARENTHESIS);
         } else {
             for(int i = 0; i < childObjects.size(); i++) {
                 SqlObject object = childObjects.get(i);
@@ -87,7 +87,7 @@ public class SqlObjectOperator extends SqlObject {
                     // insert LEFT OPERAND
                     object.build(_statement);
                     // insert OPERATOR
-                    _statement.add(new SqlObjectValue(getName()));
+                    _statement.add(getName());
                 } else {
                     object.build(_statement);
                 }
@@ -95,7 +95,7 @@ public class SqlObjectOperator extends SqlObject {
                     break;
                 }
                 if((i == childObjects.size()-2) && name.equals(BETWEEN) ) {
-                    _statement.add(new SqlObjectValue(AND));
+                    _statement.add(AND);
                 }
             }
         }

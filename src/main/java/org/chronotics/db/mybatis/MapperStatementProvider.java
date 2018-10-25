@@ -4,6 +4,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,15 +18,15 @@ import java.util.Map;
  * SqlSessionTemplate has two types.
  * One is simple, the other is batch
  */
-@Repository("MapperMySqlN")
-public class MapperMySqlN implements IMapperN {
+@Repository("MapperSimpleStatementProvider")
+public class MapperStatementProvider implements IMapperStatementProvider {
 
 	private String className = this.getClass().getName();
 	public String getClassName() {
 		return className;
 	}
 	
-	@Resource(name = "sqlSessionSimpleMySqlN")
+	@Resource(name = "sqlSessionSimpleStatementProvider")
 	private SqlSession sqlSession;
 	
 	public SqlSession getSqlSession() {
@@ -78,8 +79,14 @@ public class MapperMySqlN implements IMapperN {
 				_statementMap);
 	}
 
-	@Override
 	public int insertMultipleItems(Map<Object, Object> _statementMaps) {
 		return 0;
+	}
+
+	@Override
+	public int doStatement(Map<Object, Object> _statementMap) {
+		return getSqlSession().update(
+				getClassName() + ".doStatement",
+				_statementMap);
 	}
 }

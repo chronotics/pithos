@@ -10,39 +10,18 @@ import java.util.stream.Collectors;
 
 public class StatementProvider {
 
-    public static class KEYWORD {
-        public static String TABLENAME = "tableName";
-        public static String RESULTSET = "resultSet";
-        public static String COLNAMES = "colNames";
-        public static String COLVALUES = "colValues";
-        public static String COLVARIABLES = "colVariables";
-        public static String RECORDS = "records";
-        public static String WHERECLAUSE = "whereClause";
-        public static String STATEMENT = "statement";
+//    public static String STATEMENT = "STATEMENT";
+    public static String STATEMENTMAP = "STATEMENTMAP";
+
+    private Map<Object, Object> statementMap = new LinkedHashMap();
+    public Map<Object,Object> getStatementMap() {
+        return statementMap;
     }
 
-    public static class NUMERIC_FUNCTION {
-        public static String AVG = "avg";
-        public static String COUNT = "count";
-        public static String COS = "cos";
-        public static String SIN = "sin";
-        public static String SQRT = "sqrt";
-        public static String SUM = "sum";
-        public static String TAN = "tan";
-    }
-
-    public static String STATEMENT = "STATEMENT";
-
-    private Map<Object, Object> objectMap = new LinkedHashMap();
     private List<SqlObject> sqlObjectList = new ArrayList<>();
-
     public void addObject(SqlObject _obj) {
         sqlObjectList.add(_obj);
     }
-
-//    public Map<Object,Object> getParameter() {
-//        return objectMap;
-//    }
 
     private void build() {
         List<Object> buildList = new ArrayList<>();
@@ -50,12 +29,8 @@ public class StatementProvider {
            object.build(buildList);
         });
 
-        objectMap.clear();
-        objectMap.put(STATEMENT, new ArrayList<>(buildList));
-    }
-
-    public Map<Object,Object> getStatementMap() {
-        return objectMap;
+        statementMap.clear();
+        statementMap.put(STATEMENTMAP, new ArrayList<>(buildList));
     }
 
     public static class Builder {
@@ -74,59 +49,136 @@ public class StatementProvider {
                 provider.addObject(object);
             }
             provider.build();
-
             return provider;
         }
 
-        private Builder addChildren(SqlObject _sqlObject, Object ..._objects) {
-            for(Object object: _objects) {
-                SqlObject sqlObject = SqlObjectValue.create(object);
-                _sqlObject.addChildObject(sqlObject);
+        private Builder addChildObject(SqlObject _sqlObject, Object ..._objects) {
+            if(_objects != null) {
+                for (Object object : _objects) {
+                    if (object instanceof SqlObject) {
+                        _sqlObject.put(object);
+                    } else {
+                        _sqlObject.put(SqlObjectValue.create(object));
+                    }
+                }
             }
             this.sqlObjects.add(_sqlObject);
             return this;
         }
 
-//        public Builder select(SqlObject ..._objects) {
-//            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);
-//            return addChildren(sqlObject, _objects);
-//        }
-
         public Builder select(Object ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);
-            return addChildren(sqlObject, _objects);
+            return addChildObject(sqlObject, _objects);
         }
 
-//        public Builder from(SqlObject ..._objects) {
-//            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FROM);
-//            return addChildren(sqlObject, _objects);
-//        }
+        public Builder insert(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.INSERT);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder update(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.UPDATE);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder delete(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.DELETE);
+            return addChildObject(sqlObject, _objects);
+        }
 
         public Builder from(Object ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FROM);
-            return addChildren(sqlObject, _objects);
+            return addChildObject(sqlObject, _objects);
         }
-
-//        public Builder where(SqlObject ..._objects) {
-//            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERE);
-//            return addChildren(sqlObject, _objects);
-//        }
 
         public Builder where(Object ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERE);
-            return addChildren(sqlObject, _objects);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder wherenot(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.WHERENOT);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder and(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.AND);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder not(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.NOT);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder andnot(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.ANDNOT);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder or(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.ANDNOT);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder ornot(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.ORNOT);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder orderby(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.ORDERBY);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder asc() {
+            SqlObject sqlObject = new SqlObjectValue(SqlObjectCommand.ASC);
+            return addChildObject(sqlObject, null);
+        }
+
+        public Builder desc() {
+            SqlObject sqlObject = new SqlObjectValue(SqlObjectCommand.DESC);
+            return addChildObject(sqlObject, null);
+        }
+
+        public Builder set(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SET);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder innerjoin(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.INNERJOIN);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder leftjoin(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.LEFTJOIN);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder rightjoin(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.RIGHTJOIN);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder fullouterjoin(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FULLOUTERJOIN);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder on(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.ON);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder limit(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.LIMIT);
+            return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder doStatement(String _str) {
+            SqlObject sqlObject = new SqlObjectValue(_str);
+            return addChildObject(sqlObject, null);
         }
     }
-
-
-    @FunctionalInterface
-    interface BinaryFunction {
-        public void function(Object _lo, Object _ro);
-    }
-
-    @FunctionalInterface
-    interface UnaryFunction {
-        public void function(Object _o);
-    }
-
 }

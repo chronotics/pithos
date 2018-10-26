@@ -10,7 +10,18 @@ import java.util.stream.Collectors;
 
 public class StatementProvider {
 
-//    public static String STATEMENT = "STATEMENT";
+    public enum BUILDTYPE {
+        MYSQL("MYSQL"),
+        ORACLE("ORACLE");
+        private String str;
+        BUILDTYPE(String _arg) {
+            str = _arg;
+        }
+        public String toString() {
+            return str;
+        }
+    }
+
     public static String STATEMENTMAP = "STATEMENTMAP";
 
     private Map<Object, Object> statementMap = new LinkedHashMap();
@@ -23,10 +34,10 @@ public class StatementProvider {
         sqlObjectList.add(_obj);
     }
 
-    private void build() {
+    private void build(BUILDTYPE _type) {
         List<Object> buildList = new ArrayList<>();
         sqlObjectList.forEach(object -> {
-           object.build(buildList);
+           object.build(buildList, _type);
         });
 
         statementMap.clear();
@@ -40,7 +51,7 @@ public class StatementProvider {
         public Builder() {
         }
 
-        public StatementProvider build() {
+        public StatementProvider build(BUILDTYPE _type) {
             StatementProvider provider = new StatementProvider();
             // for(SqlObject object: this.sqlObjects) {
             // can add the algorithm to check sequence
@@ -48,7 +59,7 @@ public class StatementProvider {
             for(SqlObject object: this.sqlObjects) {
                 provider.addObject(object);
             }
-            provider.build();
+            provider.build(_type);
             return provider;
         }
 
@@ -66,14 +77,41 @@ public class StatementProvider {
             return this;
         }
 
+        private Builder addValues(SqlObject _sqlObject, List<Object> _objects) {
+            if(_objects != null) {
+                for (Object object : _objects) {
+                    if (object instanceof SqlObject) {
+                        _sqlObject.put(object);
+                    } else {
+                        _sqlObject.put(SqlObjectValue.create(object));
+                    }
+                }
+            }
+            this.sqlObjects.add(_sqlObject);
+            return this;
+        }
         public Builder select(Object ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SELECT);
             return addChildObject(sqlObject, _objects);
         }
 
-        public Builder insert(Object ..._objects) {
-            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.INSERT);
+        public Builder insertInto(String _tableName) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.INSERTINTO);
+            return addChildObject(sqlObject, _tableName);
+        }
+
+        public Builder insertColumns(Object ..._objects) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.INSERTCOLUMNS);
             return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder values(List<Object> _values) {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.VALUES);
+            return addValues(sqlObject, _values);
+//            for(Object object: _values) {
+//                addChildObject(sqlObject, object);
+//            }
+//            return this;
         }
 
         public Builder update(Object ..._objects) {
@@ -141,7 +179,7 @@ public class StatementProvider {
             return addChildObject(sqlObject, null);
         }
 
-        public Builder set(Object ..._objects) {
+        public Builder set(SqlObjectOperator ..._objects) {
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.SET);
             return addChildObject(sqlObject, _objects);
         }

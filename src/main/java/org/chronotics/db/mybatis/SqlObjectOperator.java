@@ -45,7 +45,7 @@ public class SqlObjectOperator extends SqlObject {
 //    }
 
     @Override
-    public void build(List<Object> _statement) {
+    public void build(List<Object> _statement, StatementProvider.BUILDTYPE _type) {
         if(getName().equals(EQ) ||
                 getName().equals(LT) ||
                 getName().equals(LE) ||
@@ -70,7 +70,7 @@ public class SqlObjectOperator extends SqlObject {
             _statement.add(LPARENTHESIS);
             for(int i = 0; i < childObjects.size(); i++) {
                 SqlObject object = childObjects.get(i);
-                object.build(_statement);
+                object.build(_statement, _type);
                 if(i == childObjects.size() - 1) {
                     break;
                 }
@@ -85,11 +85,11 @@ public class SqlObjectOperator extends SqlObject {
                 // i >= 2 : RIGHT OPERAND
                 if(i == 0) {
                     // insert LEFT OPERAND
-                    object.build(_statement);
+                    object.build(_statement, _type);
                     // insert OPERATOR
                     _statement.add(getName());
                 } else {
-                    object.build(_statement);
+                    object.build(_statement, _type);
                 }
                 if(i == childObjects.size() - 1) {
                     break;

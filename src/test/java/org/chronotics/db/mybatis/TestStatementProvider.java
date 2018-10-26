@@ -1,5 +1,7 @@
 package org.chronotics.db.mybatis;
 
+import com.google.common.primitives.Ints;
+import oracle.sql.BLOB;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -39,19 +41,19 @@ public class TestStatementProvider {
     public static String CTIMESTAMP = "c9";
 
     // for Table1
-    public static List<Map<String,Object>> itemSet1 =
-            new ArrayList<Map<String,Object>>();
+    public static List<Map<String, Object>> itemSet1 =
+            new ArrayList<Map<String, Object>>();
     public static int itemCount = 100;
 
     // for Table2
-    public static List<Map<String,Object>> itemSet2 =
-            new ArrayList<Map<String,Object>>();
+    public static List<Map<String, Object>> itemSet2 =
+            new ArrayList<Map<String, Object>>();
 
     private void createTables() {
         dropTables();
         {
-            String statement=
-                    "CREATE TABLE "+ TABLE1 +" (" +
+            String statement =
+                    "CREATE TABLE " + TABLE1 + " (" +
                             "	c0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
                             "	c1 VARCHAR(255) NULL," +
                             "	c2 VARCHAR(255) NULL," +
@@ -67,13 +69,13 @@ public class TestStatementProvider {
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .doStatement(statement)
-                    .build();
-            Map<Object,Object> statementMap = provider.getStatementMap();
+                    .build(StatementProvider.BUILDTYPE.MYSQL);
+            Map<Object, Object> statementMap = provider.getStatementMap();
             mapper.doStatement(statementMap);
         }
         {
-            String statement=
-                    "CREATE TABLE "+ TABLE2 +" (" +
+            String statement =
+                    "CREATE TABLE " + TABLE2 + " (" +
                             "	c0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
                             "	c1 VARCHAR(255) NULL," +
                             "	c2 VARCHAR(255) NULL," +
@@ -89,61 +91,67 @@ public class TestStatementProvider {
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .doStatement(statement)
-                    .build();
-            Map<Object,Object> statementMap = provider.getStatementMap();
+                    .build(StatementProvider.BUILDTYPE.MYSQL);
+            Map<Object, Object> statementMap = provider.getStatementMap();
             mapper.doStatement(statementMap);
         }
     }
 
     private void dropTables() {
         {
-            String statement=
+            String statement =
                     "DROP TABLE IF EXISTS " + TABLE1;
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .doStatement(statement)
-                    .build();
-            Map<Object,Object> statementMap = provider.getStatementMap();
+                    .build(StatementProvider.BUILDTYPE.MYSQL);
+            Map<Object, Object> statementMap = provider.getStatementMap();
             mapper.doStatement(statementMap);
         }
         {
-            String statement=
+            String statement =
                     "DROP TABLE IF EXISTS " + TABLE2;
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .doStatement(statement)
-                    .build();
-            Map<Object,Object> statementMap = provider.getStatementMap();
+                    .build(StatementProvider.BUILDTYPE.MYSQL);
+            Map<Object, Object> statementMap = provider.getStatementMap();
             mapper.doStatement(statementMap);
         }
     }
 
     @BeforeClass
     public static void setup() {
-        for(int i=0; i<itemCount; i++) {
-            Map<String,Object> item =
-                    new LinkedHashMap<String,Object>();
+        for (int i = 0; i < itemCount; i++) {
+            Map<String, Object> item =
+                    new LinkedHashMap<String, Object>();
             item.put(CSTR1, Integer.toString(i));
             item.put(CSTR2, Integer.toString(i));
-            item.put(CNUMBER, (double)i);
+            item.put(CNUMBER, (double) i);
             // BINARY
+            item.put(CVARBINARY, new Integer(i).byteValue());
             // BLOB
+            item.put(CBLOB, Ints.toByteArray(i));
             // CLOB
+            item.put(CCLOB, Integer.toBinaryString(i));
             item.put(CDATE, new java.sql.Date(new java.util.Date().getTime()));
             item.put(CTIME, new java.sql.Time(new java.util.Date().getTime()));
             item.put(CTIMESTAMP, new java.sql.Timestamp(new java.util.Date().getTime()));
             itemSet1.add(item);
         }
 
-        for(int i=0; i<itemCount; i++) {
-            Map<String,Object> item =
-                    new LinkedHashMap<String,Object>();
+        for (int i = 0; i < itemCount; i++) {
+            Map<String, Object> item =
+                    new LinkedHashMap<String, Object>();
             item.put(CSTR1, Integer.toString(i));
             item.put(CSTR2, Integer.toString(i));
-            item.put(CNUMBER, (double)i);
+            item.put(CNUMBER, (double) i);
             // BINARY
+            item.put(CVARBINARY, new Integer(i).byteValue());
             // BLOB
+            item.put(CBLOB, Ints.toByteArray(i));
             // CLOB
+            item.put(CCLOB, Integer.toBinaryString(i));
             item.put(CDATE, new java.sql.Date(new java.util.Date().getTime()));
             item.put(CTIME, new java.sql.Time(new java.util.Date().getTime()));
             item.put(CTIMESTAMP, new java.sql.Timestamp(new java.util.Date().getTime()));
@@ -153,16 +161,77 @@ public class TestStatementProvider {
 
     @Test
     public void testCustomStatement() throws Exception {
-//        StatementProvider provider = new StatementProvider
-//                .Builder()
-//                .doStatement("SELECT * FROM bp")
-//                .build();
-//        Map<Object,Object> statementMap = provider.getStatementMap();
-//
-//        int result = mapper.doStatement(statementMap);
-//        assertTrue(result != 0);
-
         createTables();
+
+        dropTables();
+    }
+
+    private int insertItem(String _tableName) throws Exception {
+        List<Map<String,Object>> itemSet;
+        if(_tableName == TABLE1) {
+            itemSet = itemSet1;
+        } else if (_tableName == TABLE2) {
+            itemSet = itemSet2;
+        } else {
+            assert(false);
+            return 0;
+        }
+
+        int result = 0;
+        List<Object> record = new ArrayList<>();
+        for (Map<String, Object> entry : itemSet) {
+            List<Object> values = new ArrayList<>();
+
+            String str1 = (String) entry.get(CSTR1);
+            String str2 = (String) entry.get(CSTR2);
+            Object number = entry.get(CNUMBER);
+            byte binary = (byte) entry.get(CVARBINARY);
+            byte[] blob = (byte[]) entry.get(CBLOB);
+            String clob = (String)entry.get(CCLOB);
+            Object date = entry.get(CDATE);
+            Object time = entry.get(CTIME);
+            Object timestamp = entry.get(CTIMESTAMP);
+
+            values.add(str1);
+            values.add(str2);
+            values.add(number);
+//            values.add(binary);
+//            values.add(blob);
+//            values.add(clob);
+            values.add(date);
+            values.add(time);
+            values.add(timestamp);
+
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .insertInto(TABLE1)
+                    .insertColumns(
+                            "C1",
+                            "C2",
+                            "C3",
+//                            "C4",
+//                            "C5",
+//                            "C6",
+                            "C7",
+                            "C8",
+                            "C9"
+                    )
+                    .values(values)
+                    .build(StatementProvider.BUILDTYPE.MYSQL);
+            Map<Object, Object> statementMap = provider.getStatementMap();
+
+            result += mapper.doStatement(statementMap);
+        }
+
+        return result;
+    }
+
+    @Test
+    public void testInsert() throws Exception {
+        createTables();
+        int result = this.insertItem(TABLE1);
+        assertTrue(result != 0);
+        dropTables();
     }
 
     @Test
@@ -190,16 +259,16 @@ public class TestStatementProvider {
                 .select("hbp", "lbp")
                 .from("bp")
                 .where(new SqlObjectOperator(SqlObjectOperator.EQ)
-                    .put("hbp",120))
+                        .put("hbp", 120))
                 .and(new SqlObjectOperator(SqlObjectOperator.EQ)
-                        .put("lbp",90))
+                        .put("lbp", 90))
                 .orderby("hbp", "lbp")
                 .desc()
                 .limit(1)
-                .build();
-        Map<Object,Object> statementMap = provider.getStatementMap();
+                .build(StatementProvider.BUILDTYPE.MYSQL);
+        Map<Object, Object> statementMap = provider.getStatementMap();
 
-        List<Map<String,Object>> result = mapper.selectList(statementMap);
+        List<Map<String, Object>> result = mapper.selectList(statementMap);
         assertTrue(result.size() != 0);
         System.out.println(result);
 

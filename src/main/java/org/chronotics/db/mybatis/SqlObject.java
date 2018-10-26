@@ -33,5 +33,5 @@ public abstract class SqlObject {
         return this;
     }
 
-    public abstract void build(List<Object> _list);
+    public abstract void build(List<Object> _list, StatementProvider.BUILDTYPE _type);
 }

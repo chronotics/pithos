@@ -17,13 +17,13 @@ public class SqlObjectFunction extends SqlObject {
     }
 
     @Override
-    public void build(List<Object> _statement) {
+    public void build(List<Object> _statement, StatementProvider.BUILDTYPE _type) {
         // insert Function
         _statement.add(getName());
 
         for(int i = 0; i < childObjects.size(); i++) {
             SqlObject object = childObjects.get(i);
-            object.build(_statement);
+            object.build(_statement, _type);
             // insert ( for general Function, ex) COUNT"("
             if(i == 0 && !name.equals((PARENTHESIS))) {
                 _statement.add(LPARENTHESIS);

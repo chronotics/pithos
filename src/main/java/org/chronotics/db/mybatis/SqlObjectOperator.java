@@ -17,35 +17,33 @@ public class SqlObjectOperator extends SqlObject {
     public static String LIKE = "LIKE";
     public static String IN = "IN";
 
-//    public class EQ {
-//        public EQ() {
-//            objectType = OBJECTTYPE.STATEMENT;
-//            name = EQ;
-//        }
-//    }
-//
-//    public class BETWEEN {
-//        public BETWEEN() {
-//            objectType = OBJECTTYPE.STATEMENT;
-//            name = BETWEEN;
-//        }
-//    }
 
     public SqlObjectOperator(String _name) {
-//        setType(OBJECTTYPE.STATEMENT);
         setName(_name);
     }
-//    private SqlObjectOperator(OBJECTTYPE _type) {
-//        super(_type);
-//    }
 
-//    @Override
-//    public void addChildObject(SqlObject _obj) {
-//
-//    }
+    private SqlObject leftOperand = null;
+
+    public SqlObjectOperator setLeftOperand(Object _object) {
+        if(_object instanceof SqlObject) {
+            leftOperand = (SqlObject)_object;
+        } else {
+            leftOperand = SqlObjectValue.create(_object, false);
+        }
+        return this;
+    }
+
+    public SqlObjectOperator addRightOperand(Object ..._objects) {
+        for(Object object: _objects) {
+            addChild(object, true);
+        }
+        return this;
+    }
 
     @Override
     public void build(List<Object> _statement, StatementProvider.BUILDTYPE _type) {
+        assert(leftOperand != null);
+
         if(getName().equals(EQ) ||
                 getName().equals(LT) ||
                 getName().equals(LE) ||
@@ -54,50 +52,46 @@ public class SqlObjectOperator extends SqlObject {
                 getName().equals(GT) ||
                 getName().equals(LIKE)
         ) {
-            assert(childObjects.size() == 2); // LEFT and RIGHT operand
+            assert(childObjects.size() == 1); // LEFT and RIGHT operand
         }
         if(getName().equals(BETWEEN)
         ) {
-            assert(childObjects.size() == 3); // LEFT and RIGHT from and RIGHT to operand
+            assert(childObjects.size() == 2); // LEFT and RIGHT from and RIGHT to operand
         }
         if(getName().equals(IN)
         ) {
-            assert(childObjects.size() >= 2); // LEFT and RIGHT(many)
+            assert(childObjects.size() >= 1); // LEFT and RIGHT(many)
+        }
+
+        // set left operand and operator
+        // ex) COL LIKE
+        leftOperand.build(_statement, _type);
+//        _statement.add(getName());
+        SqlObjectValue.buildString(_statement,getName());
+
+        if(name.equals(IN)) {
+//            _statement.add(LPARENTHESIS);
+            SqlObjectValue.buildString(_statement,LPARENTHESIS);
+        }
+
+        for(int i = 0; i < childObjects.size(); i++) {
+            childObjects.get(i).build(_statement, _type);
+            if((i == childObjects.size()-2) && name.equals(BETWEEN) ) {
+//                _statement.add(AND);
+                SqlObjectValue.buildString(_statement,AND);
+            }
+            if(i == childObjects.size() - 1) {
+                break;
+            }
+            if(name.equals(IN)) {
+//                _statement.add(COMMA);
+                SqlObjectValue.buildString(_statement,COMMA);
+            }
         }
 
         if(name.equals(IN)) {
-            _statement.add(getName());
-            _statement.add(LPARENTHESIS);
-            for(int i = 0; i < childObjects.size(); i++) {
-                SqlObject object = childObjects.get(i);
-                object.build(_statement, _type);
-                if(i == childObjects.size() - 1) {
-                    break;
-                }
-                _statement.add(COMMA);
-            }
-            _statement.add(RPARENTHESIS);
-        } else {
-            for(int i = 0; i < childObjects.size(); i++) {
-                SqlObject object = childObjects.get(i);
-                // i = 0 : LEFT OPERAND
-                // i = 1 : OPERATOR
-                // i >= 2 : RIGHT OPERAND
-                if(i == 0) {
-                    // insert LEFT OPERAND
-                    object.build(_statement, _type);
-                    // insert OPERATOR
-                    _statement.add(getName());
-                } else {
-                    object.build(_statement, _type);
-                }
-                if(i == childObjects.size() - 1) {
-                    break;
-                }
-                if((i == childObjects.size()-2) && name.equals(BETWEEN) ) {
-                    _statement.add(AND);
-                }
-            }
+//            _statement.add(RPARENTHESIS);
+            SqlObjectValue.buildString(_statement,RPARENTHESIS);
         }
     }
 }

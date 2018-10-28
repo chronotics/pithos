@@ -3,13 +3,18 @@ package org.chronotics.db.mybatis;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
+import java.text.MessageFormat;
+import java.util.*;
 
 public class SqlObjectValue extends SqlObject {
     // String
     // Variable (Number, SqlObject...)
-    private Object value = null;
+    private Object object = null;
+    public Object getObject() {
+        return object;
+    }
+
+    private boolean isParameter = false;
 
     private static class Factory {
 
@@ -190,49 +195,88 @@ public class SqlObjectValue extends SqlObject {
         }
     }
 
-    public SqlObjectValue(Object _v) {
+    public SqlObjectValue(Object _v, boolean _isParameter) {
+        isParameter = _isParameter;
+
         if (_v instanceof String[]) {
             StringBuilder builder = new StringBuilder();
             String[] temp = (String[]) _v;
             for (String s : temp) {
                 builder.append(s);
             }
-            value = builder.toString();
+            object = builder.toString();
         } else if (_v instanceof Boolean) {
-            value = Factory.createBoolean(_v);
+            object = Factory.createBoolean(_v);
         } else if (_v instanceof Byte) {
-            value = Factory.createByte(_v);
+            object = Factory.createByte(_v);
         } else if (_v instanceof Character) {
-            value = Factory.createCharacter(_v);
+            object = Factory.createCharacter(_v);
         } else if (_v instanceof Short) {
-            value = Factory.createShort(_v);
+            object = Factory.createShort(_v);
         } else if (_v instanceof Integer) {
-            value = Factory.createInteger(_v);
+            object = Factory.createInteger(_v);
         } else if (_v instanceof Long) {
-            value = Factory.createLong(_v);
+            object = Factory.createLong(_v);
         } else if (_v instanceof Float) {
-            value = Factory.createFloat(_v);
+            object = Factory.createFloat(_v);
         } else if (_v instanceof Double) {
-            value = Factory.createDouble(_v);
+            object = Factory.createDouble(_v);
         } else {
-                value = _v;
+            object = _v;
         }
     }
 
-    public static SqlObjectValue create(Object _object) {
-        return new SqlObjectValue(_object);
+    public static SqlObjectValue create(Object _object, boolean _isParameter) {
+        return new SqlObjectValue(_object, _isParameter);
     }
+
+    public static void buildString(List<Object> _statement, String _v) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put(PREPAREDSTATEMENT, _v);
+        _statement.add(map);
+    }
+
+    static String PREPAREDSTATEMENT = "PREPAREDSTATEMENT";
+    static String PARAMETER = "PARAMETER";
 
     @Override
     public void build(List<Object> _statement, StatementProvider.BUILDTYPE _type) {
-        if (value instanceof String) {
-            System.out.println("value is String tyep");
-        } else if (value instanceof String[]) {
-            System.out.println("value is String array");
+        if (object instanceof List) {
+            SqlObjectValue.buildString(_statement, LPARENTHESIS);
+            int i = 0;
+            for (Object e : (List) object) {
+                if (isParameter && object instanceof String) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put(PREPAREDSTATEMENT, "\'" + e + "\'");
+                    _statement.add(map);
+                } else if (!isParameter) {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put(PREPAREDSTATEMENT, e);
+                    _statement.add(map);
+                } else {
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put(PARAMETER, e);
+                    _statement.add(map);
+                }
+                if (i == ((List) object).size() - 1) {
+                    break;
+                }
+                SqlObjectValue.buildString(_statement, COMMA);
+                i++;
+            }
+            SqlObjectValue.buildString(_statement, RPARENTHESIS);
+        } else if (isParameter && object instanceof String) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put(PREPAREDSTATEMENT, "\'" + object + "\'");
+            _statement.add(map);
+        } else if (!isParameter) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put(PREPAREDSTATEMENT, object);
+            _statement.add(map);
         } else {
-            System.out.println("is not String type");
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put(PARAMETER, object);
+            _statement.add(map);
         }
-
-        _statement.add(value);
     }
 }

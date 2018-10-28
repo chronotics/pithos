@@ -22,13 +22,11 @@ public abstract class SqlObject {
 
     protected List<SqlObject> childObjects = new ArrayList<>();
 
-    public SqlObject put(Object ..._objects) {
-        for(Object object: _objects) {
-            if(object instanceof SqlObject) {
-                childObjects.add((SqlObject) object);
-            } else {
-                childObjects.add(SqlObjectValue.create(object));
-            }
+    public SqlObject addChild(Object _object, boolean _isParameter) {
+        if(_object instanceof SqlObject) {
+            childObjects.add((SqlObject) _object);
+        } else {
+            childObjects.add(SqlObjectValue.create(_object,_isParameter));
         }
         return this;
     }

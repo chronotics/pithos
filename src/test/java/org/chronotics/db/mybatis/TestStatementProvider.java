@@ -1,7 +1,7 @@
 package org.chronotics.db.mybatis;
 
 import com.google.common.primitives.Ints;
-import oracle.sql.BLOB;
+//import oracle.sql.BLOB;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -180,7 +181,6 @@ public class TestStatementProvider {
         int result = 0;
         List<Object> record = new ArrayList<>();
         for (Map<String, Object> entry : itemSet) {
-            List<Object> values = new ArrayList<>();
 
             String str1 = (String) entry.get(CSTR1);
             String str2 = (String) entry.get(CSTR2);
@@ -192,12 +192,24 @@ public class TestStatementProvider {
             Object time = entry.get(CTIME);
             Object timestamp = entry.get(CTIMESTAMP);
 
+            List<Object> columns = new ArrayList<>();
+            columns.add("C1");
+            columns.add("C2");
+            columns.add("C3");
+            columns.add("C4");
+            columns.add("C5");
+            columns.add("C6");
+            columns.add("C7");
+            columns.add("C8");
+            columns.add("C9");
+
+            List<Object> values = new ArrayList<>();
             values.add(str1);
             values.add(str2);
             values.add(number);
-//            values.add(binary);
-//            values.add(blob);
-//            values.add(clob);
+            values.add(binary);
+            values.add(blob);
+            values.add(clob);
             values.add(date);
             values.add(time);
             values.add(timestamp);
@@ -205,32 +217,85 @@ public class TestStatementProvider {
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .insertInto(TABLE1)
-                    .insertColumns(
-                            "C1",
-                            "C2",
-                            "C3",
-//                            "C4",
-//                            "C5",
-//                            "C6",
-                            "C7",
-                            "C8",
-                            "C9"
-                    )
-                    .values(values)
+                    .values(columns, values)
                     .build(StatementProvider.BUILDTYPE.MYSQL);
             Map<Object, Object> statementMap = provider.getStatementMap();
 
-            result += mapper.doStatement(statementMap);
+            result += mapper.insert(statementMap);
+        }
+        return result;
+    }
+
+    private int insertItemMulti(String _tableName) throws Exception {
+        List<Map<String,Object>> itemSet;
+        if(_tableName == TABLE1) {
+            itemSet = itemSet1;
+        } else if (_tableName == TABLE2) {
+            itemSet = itemSet2;
+        } else {
+            assert(false);
+            return 0;
         }
 
-        return result;
+        List<Object> columns = new ArrayList<>();
+        columns.add("C1");
+        columns.add("C2");
+        columns.add("C3");
+        columns.add("C4");
+        columns.add("C5");
+        columns.add("C6");
+        columns.add("C7");
+        columns.add("C8");
+        columns.add("C9");
+        List<List<Object>> valuesList = new ArrayList<>();
+
+        for (Map<String, Object> entry : itemSet) {
+            String str1 = (String) entry.get(CSTR1);
+            String str2 = (String) entry.get(CSTR2);
+            Object number = entry.get(CNUMBER);
+            byte binary = (byte) entry.get(CVARBINARY);
+            byte[] blob = (byte[]) entry.get(CBLOB);
+            String clob = (String)entry.get(CCLOB);
+            Object date = entry.get(CDATE);
+            Object time = entry.get(CTIME);
+            Object timestamp = entry.get(CTIMESTAMP);
+
+
+            List<Object> values = new ArrayList<>();
+            values.add(str1);
+            values.add(str2);
+            values.add(number);
+            values.add(binary);
+            values.add(blob);
+            values.add(clob);
+            values.add(date);
+            values.add(time);
+            values.add(timestamp);
+
+            valuesList.add(values);
+        }
+
+        StatementProvider provider = new StatementProvider
+                .Builder()
+                .insertMulti(TABLE1, columns, valuesList)
+                .build(StatementProvider.BUILDTYPE.MYSQL);
+        Map<Object, Object> statementMap = provider.getStatementMap();
+
+       return mapper.insert(statementMap);
     }
 
     @Test
     public void testInsert() throws Exception {
         createTables();
         int result = this.insertItem(TABLE1);
-        assertTrue(result != 0);
+        assertEquals(itemCount, result);
+        dropTables();
+    }
+
+    @Test
+    public void testInsertMulti() throws Exception {
+        createTables();
+
         dropTables();
     }
 
@@ -259,9 +324,11 @@ public class TestStatementProvider {
                 .select("hbp", "lbp")
                 .from("bp")
                 .where(new SqlObjectOperator(SqlObjectOperator.EQ)
-                        .put("hbp", 120))
+                        .setLeftOperand("hbp")
+                        .addRightOperand(120))
                 .and(new SqlObjectOperator(SqlObjectOperator.EQ)
-                        .put("lbp", 90))
+                        .setLeftOperand("lbp")
+                        .addRightOperand(90))
                 .orderby("hbp", "lbp")
                 .desc()
                 .limit(1)

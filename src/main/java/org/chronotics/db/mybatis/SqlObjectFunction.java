@@ -10,7 +10,6 @@ public class SqlObjectFunction extends SqlObject {
     public static String SUM = "SUM";
     public static String COUNT = "COUNT";
     public static String PARENTHESIS = "(";
-//    public class SUM
 
     public SqlObjectFunction(String _name) {
         setName(_name);
@@ -19,24 +18,25 @@ public class SqlObjectFunction extends SqlObject {
     @Override
     public void build(List<Object> _statement, StatementProvider.BUILDTYPE _type) {
         // insert Function
-        _statement.add(getName());
+        SqlObjectValue.buildString(_statement,getName());
 
         for(int i = 0; i < childObjects.size(); i++) {
-            SqlObject object = childObjects.get(i);
-            object.build(_statement, _type);
             // insert ( for general Function, ex) COUNT"("
             if(i == 0 && !name.equals((PARENTHESIS))) {
-                _statement.add(LPARENTHESIS);
+                SqlObjectValue.buildString(_statement,LPARENTHESIS);
             }
+
+            childObjects.get(i).build(_statement, _type);
+
             if(i == childObjects.size() - 1) {
                 break;
             }
             if(name.equals(PARENTHESIS)) {
-                _statement.add(COMMA);
+                SqlObjectValue.buildString(_statement,COMMA);
             } else {
             }
         }
         // insert ) for all Function
-        _statement.add(RPARENTHESIS);
+        SqlObjectValue.buildString(_statement,RPARENTHESIS);
     }
 }

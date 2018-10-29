@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-
-//import oracle.sql.BLOB;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {org.chronotics.pithos.Application.class})
@@ -162,13 +161,13 @@ public class TestStatementProviderMySql {
     }
 
     @Test
-    public void testCustomStatement() throws Exception {
+    public void testCustomStatement() {
         createTables();
 
         dropTables();
     }
 
-    private int insertItemOneByOne(String _tableName) throws Exception {
+    private int insertItemOneByOne(String _tableName) {
         List<Map<String,Object>> itemSet;
         if(_tableName == TABLE1) {
             itemSet = itemSet1;
@@ -227,7 +226,7 @@ public class TestStatementProviderMySql {
         return result;
     }
 
-    private int insertItemMulti(String _tableName) throws Exception {
+    private int insertItemMulti(String _tableName) {
         List<Map<String,Object>> itemSet;
         if(_tableName == TABLE1) {
             itemSet = itemSet1;
@@ -286,7 +285,7 @@ public class TestStatementProviderMySql {
     }
 
     @Test
-    public void testInsertOneByOne() throws Exception {
+    public void testInsertOneByOne() {
         createTables();
         int result = this.insertItemOneByOne(TABLE1);
         assertEquals(itemCount, result);
@@ -294,7 +293,7 @@ public class TestStatementProviderMySql {
     }
 
     @Test
-    public void testInsertMulti() throws Exception {
+    public void testInsertMulti() {
         createTables();
         int result = this.insertItemMulti(TABLE1);
         assertEquals(itemCount, result);
@@ -302,7 +301,7 @@ public class TestStatementProviderMySql {
     }
 
     @Test
-    public void testCustomSelect() throws Exception {
+    public void testCustomSelect() {
         createTables();
 
         insertItemMulti(TABLE1);
@@ -337,4 +336,61 @@ public class TestStatementProviderMySql {
         dropTables();
     }
 
+    @Test
+    public void testUpdate() {
+        createTables();
+        this.insertItemMulti(TABLE1);
+
+        for(int i = 0; i < itemCount; i++) {
+            String strI = String.valueOf(i);
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .update(TABLE1)
+                    .set(new SqlObjectOperator(SqlObjectOperator.EQ)
+                        .setLeftOperand("C3")
+                        .addRightOperand(i+200))
+                    .where(new SqlObjectOperator(SqlObjectOperator.EQ)
+                            .setLeftOperand("C2")
+                            .addRightOperand(strI))
+                    .build(buildType);
+            Map<Object, Object> statementMap = provider.getStatementMap();
+
+            int updatedCount = mapper.update(statementMap);
+            assertEquals(1, updatedCount);
+        }
+
+        for(int i = 0; i < itemCount; i++) {
+            String strI = String.valueOf(i);
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .select("*")
+                    .from(TABLE1)
+                    .where(new SqlObjectOperator(SqlObjectOperator.EQ)
+                            .setLeftOperand("C2")
+                            .addRightOperand(strI))
+                    .build(buildType);
+            Map<Object, Object> statementMap = provider.getStatementMap();
+
+            List<Map<String, Object>> result = mapper.selectList(statementMap);
+            assertEquals(1, result.size());
+
+            java.sql.Timestamp timestampResult = (java.sql.Timestamp) (result.get(0).get(CTIMESTAMP));
+            java.sql.Timestamp timestampOrg = (java.sql.Timestamp) (itemSet1.get(i).get(CTIMESTAMP));
+            assertEquals(timestampOrg.getTime(), timestampResult.getTime());
+
+            double actual = ((Number)result.get(0).get(CNUMBER)).doubleValue();
+            double expected = ((Number)itemSet1.get(i).get(CNUMBER)).doubleValue();
+
+            assertTrue(Math.abs(actual - expected - 200.0) < 0.001);
+        }
+
+        dropTables();
+    }
+
+    @Test
+    public void testDelete() {
+        createTables();
+
+        dropTables();
+    }
 }

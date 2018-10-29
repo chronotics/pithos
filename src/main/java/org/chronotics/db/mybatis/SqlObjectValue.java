@@ -20,7 +20,7 @@ public class SqlObjectValue extends SqlObject {
         return isParameter;
     }
 
-    private static class Factory {
+    public static class Factory {
 
         public static Object createBoolean(Object _o) {
             Constructor<Boolean> c = null;

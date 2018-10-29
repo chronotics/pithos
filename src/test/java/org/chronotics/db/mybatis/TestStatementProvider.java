@@ -23,8 +23,8 @@ import static org.junit.Assert.assertTrue;
 public class TestStatementProvider {
     public ExpectedException exceptions = ExpectedException.none();
 
-    @Resource(name = "mapperSimpleStatementProvider")
-    private MapperStatementProvider mapper;
+    @Resource(name = "mapperSimpleMySql")
+    private Mapper mapper;
 
     // table name
     public static String TABLE1 = "table1";
@@ -167,7 +167,7 @@ public class TestStatementProvider {
         dropTables();
     }
 
-    private int insertItem(String _tableName) throws Exception {
+    private int insertItemOneByOne(String _tableName) throws Exception {
         List<Map<String,Object>> itemSet;
         if(_tableName == TABLE1) {
             itemSet = itemSet1;
@@ -285,9 +285,9 @@ public class TestStatementProvider {
     }
 
     @Test
-    public void testInsert() throws Exception {
+    public void testInsertOneByOne() throws Exception {
         createTables();
-        int result = this.insertItem(TABLE1);
+        int result = this.insertItemOneByOne(TABLE1);
         assertEquals(itemCount, result);
         dropTables();
     }
@@ -295,50 +295,43 @@ public class TestStatementProvider {
     @Test
     public void testInsertMulti() throws Exception {
         createTables();
-
+        int result = this.insertItemMulti(TABLE1);
+        assertEquals(itemCount, result);
         dropTables();
     }
 
     @Test
     public void testCustomSelect() throws Exception {
-//        createTables();
+        createTables();
 
-//        int resultCount = 0;
-//        resultCount = insertItemsOneByOne(TABLE1);
-//        assertEquals(itemCount, resultCount);
-//
-////        resultCount = insertItemsOneByOne(TABLE2);
-////        assertEquals(itemCount, resultCount);
-//
-////        String statement = "SELECT * FROM table1.user";
-////        Map<Object,Object> sqlStatement = new LinkedHashMap<Object,Object>();
-////        sqlStatement.put(KEYWORD.STATEMENT,statement);
-////
-////        mapper.doStatement(sqlStatement);
+        insertItemMulti(TABLE1);
 
-//        SqlObject eqCondition = new SqlObjectOperator(SqlObjectOperator.EQ);
-//        eqCondition.addChildObject("hbp",120);
-        Integer i = new Integer(1);
-        StatementProvider provider = new StatementProvider
-                .Builder()
-                .select("hbp", "lbp")
-                .from("bp")
-                .where(new SqlObjectOperator(SqlObjectOperator.EQ)
-                        .setLeftOperand("hbp")
-                        .addRightOperand(120))
-                .and(new SqlObjectOperator(SqlObjectOperator.EQ)
-                        .setLeftOperand("lbp")
-                        .addRightOperand(90))
-                .orderby("hbp", "lbp")
-                .desc()
-                .limit(1)
-                .build(StatementProvider.BUILDTYPE.MYSQL);
-        Map<Object, Object> statementMap = provider.getStatementMap();
+        for(int i = 0; i < itemCount; i++) {
+            String strI = String.valueOf(i);
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .select("*")
+                    .from(TABLE1)
+                    .where(new SqlObjectOperator(SqlObjectOperator.EQ)
+                            .setLeftOperand("C2")
+                            .addRightOperand(strI))
+                    .and(new SqlObjectOperator(SqlObjectOperator.EQ)
+                            .setLeftOperand("C3")
+                            .addRightOperand(i))
+                    .orderby("C1")
+                    .desc()
+                    .build(StatementProvider.BUILDTYPE.MYSQL);
+            Map<Object, Object> statementMap = provider.getStatementMap();
 
-        List<Map<String, Object>> result = mapper.selectList(statementMap);
-        assertTrue(result.size() != 0);
-        System.out.println(result);
+            List<Map<String, Object>> result = mapper.selectList(statementMap);
+            assertEquals(1, result.size());
 
+            java.sql.Timestamp timestampResult = (java.sql.Timestamp) (result.get(0).get(CTIMESTAMP));
+            java.sql.Timestamp timestampOrg = (java.sql.Timestamp) (itemSet1.get(i).get(CTIMESTAMP));
+            assertEquals(timestampOrg.getTime(), timestampResult.getTime());
+
+            assertEquals(itemSet1.get(i).get(CSTR2), (String) result.get(0).get(CSTR2));
+        }
 
         dropTables();
     }

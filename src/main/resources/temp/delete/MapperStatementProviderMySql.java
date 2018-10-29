@@ -17,17 +17,17 @@ import java.util.Map;
  * SqlSessionTemplate has two types.
  * One is simple, the other is batch
  */
-@Repository("mapperSimpleStatementProvider")
-public class MapperStatementProvider implements IMapperStatementProvider {
+@Repository("mapperSimpleStatementProviderMySql")
+public class MapperStatementProviderMySql implements IMapperStatementProvider {
 
 	private String className = this.getClass().getName();
 	public String getClassName() {
 		return className;
 	}
-	
+
 //	@Resource(name = "sqlSessionSimpleMySql")
-	private SqlSession sqlSession;
-	
+	private SqlSession sqlSession = null;
+
 	public SqlSession getSqlSession() {
 		return sqlSession;
 	}

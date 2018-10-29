@@ -1,4 +1,4 @@
-package org.chronotics.db.mybatis;
+package temp.delete.mybatis;
 
 import java.util.List;
 import java.util.Map;
@@ -30,8 +30,6 @@ public interface IMapperStatementProvider {
 	int update(Map<Object, Object> _statementMap);
 
 	int delete(Map<Object, Object> _statementMap);
-
-	int insertMultipleItems(Map<Object, Object> _statementMaps);
 
 	int doStatement(Map<Object, Object> _statementMap);
 }

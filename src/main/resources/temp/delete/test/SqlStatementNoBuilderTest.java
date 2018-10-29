@@ -1,4 +1,4 @@
-package org.chronotics.db.mybatis;
+package temp.delete.test;
 
 import static org.junit.Assert.assertEquals;
 

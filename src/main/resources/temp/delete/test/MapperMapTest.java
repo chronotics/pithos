@@ -1,4 +1,4 @@
-package org.chronotics.db.mybatis;
+package temp.delete.test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,19 +23,19 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {org.chronotics.pithos.Application.class})
-public class MultipleMapperTest {
+public class MapperMapTest {
 	
 	@Rule
 	public ExpectedException exceptions = ExpectedException.none();
 	
-	@Resource(name = "mapperSimpleMySql")
-	private MapperMySql mapperMySql;
+//	@Resource(name = "mapperSimpleMySql")
+//	private MapperMySql mapperMySql;
+//	
+//	@Resource(name = "mapperSimpleOracle")
+//	private MapperOracle mapperOracle;
 	
-	@Resource(name = "mapperSimpleOracle")
-	private MapperOracle mapperOracle;
-	
-//	@Resource(name = "mapperMap")
-//	private MapperMap mapperMap;
+	@Resource(name = "mapperMap")
+	private MapperMap mapperMap;
 
 	// table name
 	public static String TABLE1 = "table1";
@@ -59,7 +59,7 @@ public class MultipleMapperTest {
 
 	public static int itemCount = 100;
 	private void createOracleTables() {
-//		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
+		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
 		
 		dropOracleTables();
 		{
@@ -101,7 +101,7 @@ public class MultipleMapperTest {
 	}
 	
 	private void dropOracleTables() {
-//		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
+		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
 		{
 			String statement=
 			"DROP TABLE " + TABLE1;
@@ -116,7 +116,7 @@ public class MultipleMapperTest {
 	}
 	
 	private void createMySqlTables() {
-//		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
+		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
 		dropMySqlTables();
 		{
 			String statement=
@@ -141,7 +141,7 @@ public class MultipleMapperTest {
 	}
 	
 	private void dropMySqlTables() {
-//		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
+		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
 		{
 			String statement=
 			"DROP TABLE IF EXISTS " + TABLE1;
@@ -152,7 +152,7 @@ public class MultipleMapperTest {
 	}
 	
 	private int insertMultipleOracleItems() {
-//		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
+		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
 		List<Map<String,Object>> itemSet = itemSetOracle;
 		
 		Map<Object,Object> queryParameter = new LinkedHashMap<Object,Object>();
@@ -208,7 +208,7 @@ public class MultipleMapperTest {
 	}
 	
 	private int insertOracleItemsOneByOne() {
-//		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
+		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
 		List<Map<String,Object>> itemSet = itemSetOracle;
 		
 		int totalInsertion = 0;
@@ -266,7 +266,7 @@ public class MultipleMapperTest {
 	}
 
 	private int insertMultipleMySqlItems() {
-//		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
+		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
 		
 		List<Object> colNames = new ArrayList<Object>();
 		colNames.add(CSTR1);
@@ -319,7 +319,7 @@ public class MultipleMapperTest {
 	}
 	
 	private int insertMySqlItemsOneByOne() {
-//		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
+		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
 		
 		int totalInsertion = 0;
 		// insert
@@ -409,7 +409,7 @@ public class MultipleMapperTest {
 	
 	@Test
 	public void testInsertSelectOracle() {
-//		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
+		IMapper mapperOracle = mapperMap.get("mapperSimpleOracle");
 		int resultCount = 0;
 		createOracleTables();		
 		
@@ -452,7 +452,7 @@ public class MultipleMapperTest {
 	}
 	@Test
 	public void testInsertSelectMySql() {
-//		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
+		IMapper mapperMySql = mapperMap.get("mapperSimpleMySql");
 		
 		int resultCount = 0;
 		

@@ -16,6 +16,10 @@ public class SqlObjectValue extends SqlObject {
 
     private boolean isParameter = false;
 
+    public boolean isParameter() {
+        return isParameter;
+    }
+
     private static class Factory {
 
         public static Object createBoolean(Object _o) {

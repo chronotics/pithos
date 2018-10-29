@@ -67,26 +67,40 @@ public class SqlObjectCommand extends SqlObject {
         // ('v1', 'v2', ... vn)
 
         String tableNameForOracle = "";
-        List<Object> columnsForOracle = null;
+        SqlObjectValue columnsForOracle = null;
         for(int i = 0; i < childObjects.size(); i++) {
             if(name.equals(INSERTMULTI)) {
                 if(_type == StatementProvider.BUILDTYPE.MYSQL) {
+                    // Table Name
                     if(i == 0) {
                         SqlObjectValue.buildString(_statement, "INTO");
                         childObjects.get(i).build(_statement, _type);
                     }
+                    // Columns
                     else if(i == 1) {
+                        // i == 1 => List<Object>
                         childObjects.get(i).build(_statement, _type);
-                        SqlObjectValue.buildString(_statement, VALUES);
                     }
+                    // Parameters
                     else {
-                        // i == 2 => List<List<>>
-                        List<List<Object>> valueslist =
-                                (List<List<Object>>)(((SqlObjectValue)childObjects.get(i)).getObject());
-                        for(List<Object> values: valueslist) {
-
+                        assert( i < 3);
+                        SqlObjectValue.buildString(_statement, VALUES);
+                        // i == 2 => List<List<Object>>
+                        SqlObjectValue sqlObject = (SqlObjectValue)childObjects.get(i);
+                        boolean isParameter = sqlObject.isParameter();
+                        int count = 0;
+                        List<List<Object>> valuesList =
+                                (List<List<Object>>)(sqlObject.getObject());
+                        for(List<Object> e: valuesList) {
+                            SqlObjectValue values =
+                                    SqlObjectValue.create(e, isParameter);
+                            values.build(_statement, _type);
+                            if(count == valuesList.size() -1) {
+                                break;
+                            }
+                            SqlObjectValue.buildString(_statement, COMMA);
+                            count++;
                         }
-                        childObjects.get(i).build(_statement, _type);
                     }
                 } else if (_type == ORACLE) {
                     if(i == 0) {
@@ -94,18 +108,36 @@ public class SqlObjectCommand extends SqlObject {
                         tableNameForOracle = (String)(((SqlObjectValue)childObjects.get(i)).getObject());
                     }
                     else if(i==1) {
-                        columnsForOracle = (List<Object>)(((SqlObjectValue)childObjects.get(i)).getObject());
+                        columnsForOracle = (SqlObjectValue)childObjects.get(i);
                     }
                     else {
-                        SqlObjectValue.buildString(_statement, "INTO");
-                        SqlObjectValue.buildString(_statement, tableNameForOracle);
-                    }
-                    if(i%2 == 1) {
-                        SqlObjectValue.buildString(_statement, tableNameForOracle);
-                    } else {
-
+                        assert( i < 3);
+                        // i == 2 => List<List<Object>>
+                        SqlObjectValue sqlObject = (SqlObjectValue)childObjects.get(i);
+                        boolean isParameter = sqlObject.isParameter();
+                        int count = 0;
+                        List<List<Object>> valuesList =
+                                (List<List<Object>>)(sqlObject.getObject());
+                        for(List<Object> e: valuesList) {
+                            // INTO t
+                            // (c1, c2, ... cn)
+                            SqlObjectValue.buildString(_statement, "INTO");
+                            SqlObjectValue.buildString(_statement, tableNameForOracle);
+                            columnsForOracle.build(_statement, _type);
+                            // VALUES
+                            SqlObjectValue.buildString(_statement, VALUES);
+                            SqlObjectValue values =
+                                    SqlObjectValue.create(e, isParameter);
+                            values.build(_statement, _type);
+                            if(count == valuesList.size() -1) {
+                                break;
+                            }
+                            count++;
+                        }
                     }
                 } else {
+                    // unsupported type
+                    assert(false);
                 }
             } else {
                 childObjects.get(i).build(_statement, _type);
@@ -123,8 +155,7 @@ public class SqlObjectCommand extends SqlObject {
             if(name.equals(SELECT) ||
                     name.equals(FROM) ||
                     name.equals(ORDERBY) ||
-                    name.equals(SET) ||
-                    (name.equals(INSERTMULTI) && _type == StatementProvider.BUILDTYPE.MYSQL)
+                    name.equals(SET)
                     ) {
                 SqlObjectValue.buildString(_statement,COMMA);
             } else {

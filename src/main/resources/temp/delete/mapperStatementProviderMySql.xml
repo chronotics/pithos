@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+ * @author SG Lee
+ * @since 2013
+ * @description
+ * general purpose mapper
+-->
+
+<mapper namespace="org.chronotics.db.mybatis.MapperStatementProviderMySql">
+
+    <!--
+        Please note the difference between using #{} and ${}.
+        Hashtags sign means a prepared statement variables, while dollar sign means a simple string replace.
+        like pair and sigle value
+    -->
+
+    <select id="selectOne" parameterType="map" resultType="map">
+        <if test="STATEMENTMAP != null">
+            <foreach index="index" item="item" collection="STATEMENTMAP" open="" separator="" close="">
+                <if test="item != null">
+                    <foreach index="key" item="item" collection="item" open="" separator="" close="">
+                        <if test = "key == 'PREPAREDSTATEMENT'">
+                            ${item}
+                        </if>
+                        <if test = "key == 'PARAMETER'">
+                            #{item}
+                        </if>
+                    </foreach>
+                </if>
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectList" parameterType="map" resultType="map">
+        <if test="STATEMENTMAP != null">
+            <foreach index="index" item="item" collection="STATEMENTMAP" open="" separator="" close="">
+                <if test="item != null">
+                    <foreach index="key" item="item" collection="item" open="" separator="" close="">
+                        <if test = "key == 'PREPAREDSTATEMENT'">
+                            ${item}
+                        </if>
+                        <if test = "key == 'PARAMETER'">
+                            #{item}
+                        </if>
+                    </foreach>
+                </if>
+            </foreach>
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="map">
+        <if test="STATEMENTMAP != null">
+            <foreach index="index" item="item" collection="STATEMENTMAP" open="" separator="" close="">
+                <if test="item != null">
+                    <foreach index="key" item="item" collection="item" open="" separator="" close="">
+                        <if test = "key == 'PREPAREDSTATEMENT'">
+                            ${item}
+                        </if>
+                        <if test = "key == 'PARAMETER'">
+                            #{item}
+                        </if>
+                    </foreach>
+                </if>
+            </foreach>
+        </if>
+    </insert>
+
+    <update id="update" parameterType="map">
+        <if test="STATEMENTMAP != null">
+            <foreach index="index" item="item" collection="STATEMENTMAP" open="" separator="" close="">
+                <if test="item != null">
+                    <foreach index="key" item="item" collection="item" open="" separator="" close="">
+                        <if test = "key == 'PREPAREDSTATEMENT'">
+                            ${item}
+                        </if>
+                        <if test = "key == 'PARAMETER'">
+                            #{item}
+                        </if>
+                    </foreach>
+                </if>
+            </foreach>
+        </if>
+    </update>
+
+    <delete id="delete" parameterType="map">
+        <if test="STATEMENTMAP != null">
+            <foreach index="index" item="item" collection="STATEMENTMAP" open="" separator="" close="">
+                <if test="item != null">
+                    <foreach index="key" item="item" collection="item" open="" separator="" close="">
+                        <if test = "key == 'PREPAREDSTATEMENT'">
+                            ${item}
+                        </if>
+                        <if test = "key == 'PARAMETER'">
+                            #{item}
+                        </if>
+                    </foreach>
+                </if>
+            </foreach>
+        </if>
+    </delete>
+
+    <insert id="insertMultipleItems" parameterType="map">
+        <!--
+          INSERT INTO #{tableName}
+          (
+          #{colName},
+          #{colName},
+          #{colName}
+          )
+          VALUES
+          ( // record
+          #{colValue},
+          #{colValue},
+          #{colValue}
+          ),
+          ( // record
+          #{colValue},
+          #{colValue},
+          #{colValue}
+          )
+        -->
+        <if test="STATEMENTMAP != null">
+            <foreach index="index" item="item" collection="STATEMENTMAP" open="" separator="" close="">
+                <if test="item != null">
+                    <foreach index="key" item="item" collection="item" open="" separator="" close="">
+                        <if test = "key == 'PREPAREDSTATEMENT'">
+                            ${item}
+                        </if>
+                        <if test = "key == 'PARAMETER'">
+                            #{item}
+                        </if>
+                    </foreach>
+                </if>
+            </foreach>
+        </if>
+    </insert>
+
+    <update id="doStatement" parameterType="map">
+        <if test="STATEMENTMAP != null">
+            <foreach index="index" item="item" collection="STATEMENTMAP" open="" separator="" close="">
+                <if test="item != null">
+                    <foreach index="key" item="item" collection="item" open="" separator="" close="">
+                        <if test = "key == 'PREPAREDSTATEMENT'">
+                            ${item}
+                        </if>
+                        <if test = "key == 'PARAMETER'">
+                            #{item}
+                        </if>
+                    </foreach>
+                </if>
+            </foreach>
+        </if>
+    </update>
+
+</mapper>

@@ -1,10 +1,9 @@
-package org.chronotics.db.mybatis;
+package temp.delete.mybatis;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ import java.util.Map;
  * SqlSessionTemplate has two types.
  * One is simple, the other is batch
  */
-@Repository("MapperSimpleStatementProvider")
+//@Repository("mapperSimpleStatementProvider")
 public class MapperStatementProvider implements IMapperStatementProvider {
 
 	private String className = this.getClass().getName();
@@ -26,7 +25,7 @@ public class MapperStatementProvider implements IMapperStatementProvider {
 		return className;
 	}
 	
-	@Resource(name = "sqlSessionSimpleStatementProvider")
+//	@Resource(name = "sqlSessionSimpleMySql")
 	private SqlSession sqlSession;
 	
 	public SqlSession getSqlSession() {
@@ -36,13 +35,6 @@ public class MapperStatementProvider implements IMapperStatementProvider {
 	public void setSqlSession(SqlSession _sqlSession) {
 		sqlSession = _sqlSession;
 	}
-	
-//	@Override
-//	public int generalStatement(Map<Object, Object> _statementMap) throws Exception {
-//		return getSqlSession().update(
-//				getClassName() + ".generalStatement",
-//				_statementMap);
-//	}
 
 	@Override
 	public Map<String, Object> selectOne(Map<Object, Object> _statementMap) {
@@ -77,10 +69,6 @@ public class MapperStatementProvider implements IMapperStatementProvider {
 		return getSqlSession().delete(
 				getClassName() + ".delete",
 				_statementMap);
-	}
-
-	public int insertMultipleItems(Map<Object, Object> _statementMaps) {
-		return 0;
 	}
 
 	@Override

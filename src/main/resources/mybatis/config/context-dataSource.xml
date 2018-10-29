@@ -16,7 +16,7 @@
 		http://www.springframework.org/schema/util 
         http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<util:properties id="propMySql" location="classpath:mybatis/properties/datasource-mysql-br03.properties" />
+	<util:properties id="propMySql" location="classpath:mybatis/properties/datasource-mysql.properties" />
 	<bean id="dataSourceMySql" primary="true" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
 	    <property name="driverClassName" value="#{propMySql['jdbc.driverClassName']}" />
 	    <property name="url" value="#{propMySql['jdbc.url']}" />

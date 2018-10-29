@@ -1,4 +1,4 @@
-package org.chronotics.db.mybatis;
+package temp.delete.mybatis;
 
 import java.util.List;
 import java.util.Map;
@@ -18,8 +18,8 @@ import org.springframework.stereotype.Repository;
  * SqlSessionTemplate has two types.
  * One is simple, the other is batch
  */
-@Repository("mapperMySql")
-public class MapperMySql extends Mapper {
+@Repository("mapperOracle")
+public class MapperOracle extends Mapper {
 
 	private String className = this.getClass().getName();
 	public String getClassName() {

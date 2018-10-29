@@ -3,35 +3,28 @@ package org.chronotics.db.mybatis;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Mapper implemented from IMapper
  * @author sglee
- * @since 2015
+ * @since 2013
  * @description
- * SqlSessionTemplate of Mybatis-Spring will be injected
+ * SqlSessionTemplate of Mybatis-Spring will be injected to sqlSession
  * according to Beans that are defined in context_mapperBean.xml
  * SqlSessionTemplate has two types.
  * One is simple, the other is batch
  */
-@Repository("mapperSimpleStatementProvider")
-public class MapperStatementProvider implements IMapperStatementProvider {
+//@Repository("mapperSimpleMySql")
+public class Mapper implements IMapper {
 
-	private String className = this.getClass().getName();
-	public String getClassName() {
-		return className;
-	}
-	
 //	@Resource(name = "sqlSessionSimpleMySql")
-	private SqlSession sqlSession;
+	private SqlSession sqlSession = null;
 	
 	public SqlSession getSqlSession() {
 		return sqlSession;
 	}
-
 	public void setSqlSession(SqlSession _sqlSession) {
 		sqlSession = _sqlSession;
 	}
@@ -39,42 +32,42 @@ public class MapperStatementProvider implements IMapperStatementProvider {
 	@Override
 	public Map<String, Object> selectOne(Map<Object, Object> _statementMap) {
 		return getSqlSession().selectOne(
-				getClassName() + ".selectOne",
+				IMapper.class.getName() + ".selectOne",
 				_statementMap);
 	}
 
 	@Override
 	public List<Map<String, Object>> selectList(Map<Object, Object> _statementMap) {
 		return getSqlSession().selectList(
-				getClassName() + ".selectList",
+				IMapper.class.getName() + ".selectList",
 				_statementMap);
 	}
 
 	@Override
 	public int insert(Map<Object, Object> _statementMap) {
 		return getSqlSession().insert(
-				getClassName() + ".insert",
+				IMapper.class.getName() + ".insert",
 				_statementMap);
 	}
 
 	@Override
 	public int update(Map<Object, Object> _statementMap) {
 		return getSqlSession().update(
-				getClassName() + ".update",
+				IMapper.class.getName() + ".update",
 				_statementMap);
 	}
 
 	@Override
 	public int delete(Map<Object, Object> _statementMap) {
 		return getSqlSession().delete(
-				getClassName() + ".delete",
+				IMapper.class.getName() + ".delete",
 				_statementMap);
 	}
 
 	@Override
 	public int doStatement(Map<Object, Object> _statementMap) {
 		return getSqlSession().update(
-				getClassName() + ".doStatement",
+				IMapper.class.getName() + ".doStatement",
 				_statementMap);
 	}
 }

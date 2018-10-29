@@ -1,7 +1,6 @@
 package org.chronotics.db.mybatis;
 
 import com.google.common.primitives.Ints;
-//import oracle.sql.BLOB;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -16,13 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+//import oracle.sql.BLOB;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {org.chronotics.pithos.Application.class})
-public class TestStatementProvider {
+public class TestStatementProviderMySql {
     public ExpectedException exceptions = ExpectedException.none();
 
+    private static StatementProvider.BUILDTYPE buildType = StatementProvider.BUILDTYPE.MYSQL;
     @Resource(name = "mapperSimpleMySql")
     private Mapper mapper;
 
@@ -70,7 +71,7 @@ public class TestStatementProvider {
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .doStatement(statement)
-                    .build(StatementProvider.BUILDTYPE.MYSQL);
+                    .build(buildType);
             Map<Object, Object> statementMap = provider.getStatementMap();
             mapper.doStatement(statementMap);
         }
@@ -92,7 +93,7 @@ public class TestStatementProvider {
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .doStatement(statement)
-                    .build(StatementProvider.BUILDTYPE.MYSQL);
+                    .build(buildType);
             Map<Object, Object> statementMap = provider.getStatementMap();
             mapper.doStatement(statementMap);
         }
@@ -105,7 +106,7 @@ public class TestStatementProvider {
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .doStatement(statement)
-                    .build(StatementProvider.BUILDTYPE.MYSQL);
+                    .build(buildType);
             Map<Object, Object> statementMap = provider.getStatementMap();
             mapper.doStatement(statementMap);
         }
@@ -115,7 +116,7 @@ public class TestStatementProvider {
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .doStatement(statement)
-                    .build(StatementProvider.BUILDTYPE.MYSQL);
+                    .build(buildType);
             Map<Object, Object> statementMap = provider.getStatementMap();
             mapper.doStatement(statementMap);
         }
@@ -218,7 +219,7 @@ public class TestStatementProvider {
                     .Builder()
                     .insertInto(TABLE1)
                     .values(columns, values)
-                    .build(StatementProvider.BUILDTYPE.MYSQL);
+                    .build(buildType);
             Map<Object, Object> statementMap = provider.getStatementMap();
 
             result += mapper.insert(statementMap);
@@ -278,7 +279,7 @@ public class TestStatementProvider {
         StatementProvider provider = new StatementProvider
                 .Builder()
                 .insertMulti(TABLE1, columns, valuesList)
-                .build(StatementProvider.BUILDTYPE.MYSQL);
+                .build(buildType);
         Map<Object, Object> statementMap = provider.getStatementMap();
 
        return mapper.insert(statementMap);
@@ -320,7 +321,7 @@ public class TestStatementProvider {
                             .addRightOperand(i))
                     .orderby("C1")
                     .desc()
-                    .build(StatementProvider.BUILDTYPE.MYSQL);
+                    .build(buildType);
             Map<Object, Object> statementMap = provider.getStatementMap();
 
             List<Map<String, Object>> result = mapper.selectList(statementMap);

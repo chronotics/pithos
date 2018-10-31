@@ -122,10 +122,10 @@ public class StatementProvider {
             return addChildObject(sqlObject, _objects);
         }
 
-        public Builder delete(Object ..._objects) {
-            assert(_objects!=null);
+        public Builder deleteFrom(Object _object) {
+            assert(_object!=null);
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.DELETE);
-            return addChildObject(sqlObject, _objects);
+            return addChildObject(sqlObject, _object);
         }
 
         public Builder from(Object ..._objects) {
@@ -220,6 +220,11 @@ public class StatementProvider {
             assert(_objects!=null);
             SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.FULLOUTERJOIN);
             return addChildObject(sqlObject, _objects);
+        }
+
+        public Builder union() {
+            SqlObject sqlObject = new SqlObjectCommand(SqlObjectCommand.UNION);
+            return addChildObject(sqlObject, null);
         }
 
         public Builder on(Object ..._objects) {

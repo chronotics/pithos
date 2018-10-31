@@ -7,6 +7,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import sun.security.util.Cache;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -27,19 +28,19 @@ public class TestStatementProviderMySql {
     private Mapper mapper;
 
     // table name
-    public static String TABLE1 = "table1";
-    public static String TABLE2 = "table2";
+    public static String TABLE1 = "TABLE1";
+    public static String TABLE2 = "TABLE2";
     // public static variable matches with COLUMN in DB
-    public static String CID = "c0";
-    public static String CSTR1 = "c1";
-    public static String CSTR2 = "c2";
-    public static String CNUMBER = "c3";
-    public static String CVARBINARY = "c4";
-    public static String CBLOB = "c5";
-    public static String CCLOB = "c6";
-    public static String CDATE = "c7";
-    public static String CTIME = "c8";
-    public static String CTIMESTAMP = "c9";
+    public static String CID = "C0";
+    public static String CSTR1 = "C1";
+    public static String CSTR2 = "C2";
+    public static String CNUMBER = "C3";
+    public static String CVARBINARY = "C4";
+    public static String CBLOB = "C5";
+    public static String CCLOB = "C6";
+    public static String CDATE = "C7";
+    public static String CTIME = "C8";
+    public static String CTIMESTAMP = "C9";
 
     // for Table1
     public static List<Map<String, Object>> itemSet1 =
@@ -55,17 +56,17 @@ public class TestStatementProviderMySql {
         {
             String statement =
                     "CREATE TABLE " + TABLE1 + " (" +
-                            "	c0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
-                            "	c1 VARCHAR(255) NULL," +
-                            "	c2 VARCHAR(255) NULL," +
-                            "	c3 FLOAT NULL default '0'," +
-                            "	c4 VARBINARY(255) NULL," +
-                            "	c5 BLOB NULL," +
-                            "	c6 TEXT NULL," +
-                            "	c7 DATE NULL," +
-                            "	c8 TIME NULL," +
-                            "	c9 TIMESTAMP(6) NULL," +
-                            "	PRIMARY KEY (c0)" +
+                            "	C0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
+                            "	C1 VARCHAR(255) NULL," +
+                            "	C2 VARCHAR(255) NULL," +
+                            "	C3 FLOAT NULL default '0'," +
+                            "	C4 VARBINARY(255) NULL," +
+                            "	C5 BLOB NULL," +
+                            "	C6 TEXT NULL," +
+                            "	C7 DATE NULL," +
+                            "	C8 TIME NULL," +
+                            "	C9 TIMESTAMP(6) NULL," +
+                            "	PRIMARY KEY (C0)" +
                             ");";
             StatementProvider provider = new StatementProvider
                     .Builder()
@@ -77,17 +78,17 @@ public class TestStatementProviderMySql {
         {
             String statement =
                     "CREATE TABLE " + TABLE2 + " (" +
-                            "	c0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
-                            "	c1 VARCHAR(255) NULL," +
-                            "	c2 VARCHAR(255) NULL," +
-                            "	c3 FLOAT NULL default '0'," +
-                            "	c4 VARBINARY(255) NULL," +
-                            "	c5 BLOB NULL," +
-                            "	c6 TEXT NULL," +
-                            "	c7 DATE NULL," +
-                            "	c8 TIME NULL," +
-                            "	c9 TIMESTAMP(6) NULL," +
-                            "	PRIMARY KEY (c0)" +
+                            "	X0 BIGINT(20) unsigned NOT NULL AUTO_INCREMENT," +
+                            "	C1 VARCHAR(255) NULL," +
+                            "	X2 VARCHAR(255) NULL," +
+                            "	X3 FLOAT NULL default '0'," +
+                            "	X4 VARBINARY(255) NULL," +
+                            "	X5 BLOB NULL," +
+                            "	X6 TEXT NULL," +
+                            "	X7 DATE NULL," +
+                            "	X8 TIME NULL," +
+                            "	X9 TIMESTAMP(6) NULL," +
+                            "	PRIMARY KEY (X0)" +
                             ");";
             StatementProvider provider = new StatementProvider
                     .Builder()
@@ -142,6 +143,10 @@ public class TestStatementProviderMySql {
         }
 
         for (int i = 0; i < itemCount; i++) {
+            if(i%2 == 1) {
+                continue;
+            }
+
             Map<String, Object> item =
                     new LinkedHashMap<String, Object>();
             item.put(CSTR1, Integer.toString(i));
@@ -168,18 +173,20 @@ public class TestStatementProviderMySql {
     }
 
     private int insertItemOneByOne(String _tableName) {
+        String prefix="";
         List<Map<String,Object>> itemSet;
         if(_tableName == TABLE1) {
             itemSet = itemSet1;
+            prefix="C";
         } else if (_tableName == TABLE2) {
             itemSet = itemSet2;
+            prefix="X";
         } else {
             assert(false);
             return 0;
         }
 
         int result = 0;
-        List<Object> record = new ArrayList<>();
         for (Map<String, Object> entry : itemSet) {
 
             String str1 = (String) entry.get(CSTR1);
@@ -193,15 +200,19 @@ public class TestStatementProviderMySql {
             Object timestamp = entry.get(CTIMESTAMP);
 
             List<Object> columns = new ArrayList<>();
-            columns.add("C1");
-            columns.add("C2");
-            columns.add("C3");
-            columns.add("C4");
-            columns.add("C5");
-            columns.add("C6");
-            columns.add("C7");
-            columns.add("C8");
-            columns.add("C9");
+            if(_tableName != TABLE2) {
+                columns.add(prefix + "1");
+            } else {
+                columns.add("C1");
+            }
+            columns.add(prefix+"2");
+            columns.add(prefix+"3");
+            columns.add(prefix+"4");
+            columns.add(prefix+"5");
+            columns.add(prefix+"6");
+            columns.add(prefix+"7");
+            columns.add(prefix+"8");
+            columns.add(prefix+"9");
 
             List<Object> values = new ArrayList<>();
             values.add(str1);
@@ -216,7 +227,7 @@ public class TestStatementProviderMySql {
 
             StatementProvider provider = new StatementProvider
                     .Builder()
-                    .insertInto(TABLE1)
+                    .insertInto(_tableName)
                     .values(columns, values)
                     .build(buildType);
             Map<Object, Object> statementMap = provider.getStatementMap();
@@ -227,26 +238,34 @@ public class TestStatementProviderMySql {
     }
 
     private int insertItemMulti(String _tableName) {
+        String prefix="";
         List<Map<String,Object>> itemSet;
         if(_tableName == TABLE1) {
             itemSet = itemSet1;
+            prefix="C";
         } else if (_tableName == TABLE2) {
             itemSet = itemSet2;
+            prefix="X";
         } else {
             assert(false);
             return 0;
         }
 
         List<Object> columns = new ArrayList<>();
-        columns.add("C1");
-        columns.add("C2");
-        columns.add("C3");
-        columns.add("C4");
-        columns.add("C5");
-        columns.add("C6");
-        columns.add("C7");
-        columns.add("C8");
-        columns.add("C9");
+        if(_tableName != TABLE2) {
+            columns.add(prefix + "1");
+        } else {
+            columns.add("C1");
+        }
+        columns.add(prefix+"2");
+        columns.add(prefix+"3");
+        columns.add(prefix+"4");
+        columns.add(prefix+"5");
+        columns.add(prefix+"6");
+        columns.add(prefix+"7");
+        columns.add(prefix+"8");
+        columns.add(prefix+"9");
+
         List<List<Object>> valuesList = new ArrayList<>();
 
         for (Map<String, Object> entry : itemSet) {
@@ -277,7 +296,7 @@ public class TestStatementProviderMySql {
 
         StatementProvider provider = new StatementProvider
                 .Builder()
-                .insertMulti(TABLE1, columns, valuesList)
+                .insertMulti(_tableName, columns, valuesList)
                 .build(buildType);
         Map<Object, Object> statementMap = provider.getStatementMap();
 
@@ -341,26 +360,34 @@ public class TestStatementProviderMySql {
         createTables();
         this.insertItemMulti(TABLE1);
 
+        final double offset = 200.0;
+        final double EPSILON = 0.0001;
+
         for(int i = 0; i < itemCount; i++) {
             String strI = String.valueOf(i);
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .update(TABLE1)
-                    .set(new SqlObjectOperator(SqlObjectOperator.EQ)
-                        .setLeftOperand("C3")
-                        .addRightOperand(i+200))
+                    .set(
+                            new SqlObjectOperator(SqlObjectOperator.EQ)
+                                    .setLeftOperand("C3")
+                                    .addRightOperand(i+offset),
+                            new SqlObjectOperator(SqlObjectOperator.EQ)
+                                    .setLeftOperand("C2")
+                                    .addRightOperand(String.valueOf(i+offset))
+                    )
                     .where(new SqlObjectOperator(SqlObjectOperator.EQ)
                             .setLeftOperand("C2")
                             .addRightOperand(strI))
                     .build(buildType);
             Map<Object, Object> statementMap = provider.getStatementMap();
 
-            int updatedCount = mapper.update(statementMap);
-            assertEquals(1, updatedCount);
+            int count = mapper.update(statementMap);
+            assertEquals(1, count);
         }
 
         for(int i = 0; i < itemCount; i++) {
-            String strI = String.valueOf(i);
+            String strI = String.valueOf(i+offset);
             StatementProvider provider = new StatementProvider
                     .Builder()
                     .select("*")
@@ -381,7 +408,7 @@ public class TestStatementProviderMySql {
             double actual = ((Number)result.get(0).get(CNUMBER)).doubleValue();
             double expected = ((Number)itemSet1.get(i).get(CNUMBER)).doubleValue();
 
-            assertTrue(Math.abs(actual - expected - 200.0) < 0.001);
+            assertTrue(Math.abs(actual - expected - offset) < EPSILON);
         }
 
         dropTables();
@@ -390,6 +417,187 @@ public class TestStatementProviderMySql {
     @Test
     public void testDelete() {
         createTables();
+        this.insertItemMulti(TABLE1);
+
+        for(int i = 0; i < itemCount; i++) {
+            String strI = String.valueOf(i);
+            StatementProvider provider = new StatementProvider
+                    .Builder()
+                    .deleteFrom(TABLE1)
+                    .where(new SqlObjectOperator(SqlObjectOperator.EQ)
+                            .setLeftOperand("C2")
+                            .addRightOperand(strI))
+                    .build(buildType);
+            Map<Object, Object> statementMap = provider.getStatementMap();
+
+            int count = mapper.update(statementMap);
+            assertEquals(1, count);
+        }
+
+        StatementProvider provider = new StatementProvider
+                .Builder()
+                .select("*")
+                .from(TABLE1)
+                .build(buildType);
+        Map<Object, Object> statementMap = provider.getStatementMap();
+        List<Map<String, Object>> result = mapper.selectList(statementMap);
+        assertEquals(0, result.size());
+
+        dropTables();
+    }
+
+    @Test
+    public void testJoin() {
+        createTables();
+        this.insertItemMulti(TABLE1);
+        this.insertItemMulti(TABLE2);
+
+        StatementProvider provider = new StatementProvider
+                .Builder()
+                .select(TABLE1+".C1",TABLE2+".X7")
+                .from(TABLE1)
+                .innerjoin(TABLE2)
+                .on(new SqlObjectOperator(SqlObjectOperator.EQ)
+                    .setLeftOperand(TABLE1+".C1")
+                    .setRightOperand(TABLE2+".C1",false))
+                .build(buildType);
+        Map<Object, Object> statementMap = provider.getStatementMap();
+        List<Map<String, Object>> result = mapper.selectList(statementMap);
+        assertEquals(50, result.size());
+
+        dropTables();
+    }
+
+    @Test
+    public void testLeftJoin() {
+        createTables();
+        this.insertItemMulti(TABLE1);
+        this.insertItemMulti(TABLE2);
+
+        StatementProvider provider = new StatementProvider
+                .Builder()
+                .select(TABLE1+".C1",TABLE2+".X7")
+                .from(TABLE1)
+                .leftjoin(TABLE2)
+                .on(new SqlObjectOperator(SqlObjectOperator.EQ)
+                        .setLeftOperand(TABLE1+".C1")
+                        .setRightOperand(TABLE2+".C1",false))
+                .build(buildType);
+        Map<Object, Object> statementMap = provider.getStatementMap();
+        List<Map<String, Object>> result = mapper.selectList(statementMap);
+        assertEquals(100, result.size());
+
+        dropTables();
+    }
+
+    @Test
+    public void testRightJoin() {
+        createTables();
+        this.insertItemMulti(TABLE1);
+        this.insertItemMulti(TABLE2);
+
+        StatementProvider provider = new StatementProvider
+                .Builder()
+                .select(TABLE1+".C1",TABLE2+".X7")
+                .from(TABLE1)
+                .rightjoin(TABLE2)
+                .on(new SqlObjectOperator(SqlObjectOperator.EQ)
+                        .setLeftOperand(TABLE1+".C1")
+                        .setRightOperand(TABLE2+".C1",false))
+                .build(buildType);
+        Map<Object, Object> statementMap = provider.getStatementMap();
+        List<Map<String, Object>> result = mapper.selectList(statementMap);
+        assertEquals(50, result.size());
+
+        dropTables();
+    }
+
+    /**
+     * This test is for MySql
+     */
+    @Test
+    public void testOuterJoin() {
+        createTables();
+        this.insertItemMulti(TABLE1);
+        this.insertItemMulti(TABLE2);
+
+        StatementProvider provider = new StatementProvider
+                .Builder()
+                .select(TABLE1+".C1",TABLE2+".X7")
+                .from(TABLE1)
+                .leftjoin(TABLE2)
+                .on(new SqlObjectOperator(SqlObjectOperator.EQ)
+                        .setLeftOperand(TABLE1+".C1")
+                        .setRightOperand(TABLE2+".C1",false))
+                .union()
+                .select(TABLE1+".C1",TABLE2+".X7")
+                .from(TABLE1)
+                .rightjoin(TABLE2)
+                .on(new SqlObjectOperator(SqlObjectOperator.EQ)
+                        .setLeftOperand(TABLE1+".C1")
+                        .setRightOperand(TABLE2+".C1",false))
+                .build(buildType);
+        Map<Object, Object> statementMap = provider.getStatementMap();
+        List<Map<String, Object>> result = mapper.selectList(statementMap);
+        assertEquals(100, result.size());
+
+        dropTables();
+    }
+
+    @Test
+    public void testParenthesisJoin() {
+        createTables();
+        this.insertItemMulti(TABLE1);
+        this.insertItemMulti(TABLE2);
+
+        SqlObject condition = new SqlObjectOperator(SqlObjectOperator.EQ)
+                                        .setLeftOperand(TABLE1+".C1")
+                                        .setRightOperand(TABLE2+".C1",false);
+        SqlObject and= new SqlObjectCommand(SqlObjectCommand.AND);
+        and.addChild(condition, false);
+
+        SqlObject parenthesis = new SqlObjectFunction(SqlObjectFunction.PARENTHESIS,false);
+        parenthesis.addChild(condition, false);
+        parenthesis.addChild(and, false);
+
+        StatementProvider provider = new StatementProvider
+                .Builder()
+                .select(TABLE1+".C1",TABLE2+".X7")
+                .from(TABLE1)
+                .innerjoin(TABLE2)
+                .on(new SqlObjectOperator(SqlObjectOperator.EQ)
+                        .setLeftOperand(TABLE1+".C1")
+                        .setRightOperand(TABLE2+".C1",false))
+                .and(parenthesis)
+                .build(buildType);
+        Map<Object, Object> statementMap = provider.getStatementMap();
+        List<Map<String, Object>> result = mapper.selectList(statementMap);
+        assertEquals(50, result.size());
+
+        dropTables();
+    }
+
+    @Test
+    public void testFunction() {
+        createTables();
+
+        insertItemMulti(TABLE1);
+
+        SqlObject function = new SqlObjectFunction(SqlObjectFunction.COUNT,false);
+        function.addChild("C1",false);
+        String strI = String.valueOf(2);
+        StatementProvider provider = new StatementProvider
+                .Builder()
+                .select(function)
+                .from(TABLE1)
+                .where(new SqlObjectOperator(SqlObjectOperator.EQ)
+                        .setLeftOperand("C2")
+                        .addRightOperand(strI))
+                .build(buildType);
+        Map<Object, Object> statementMap = provider.getStatementMap();
+
+        List<Map<String, Object>> result = mapper.selectList(statementMap);
+        assertEquals(1, result.size());
 
         dropTables();
     }

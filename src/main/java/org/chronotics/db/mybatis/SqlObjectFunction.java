@@ -9,31 +9,36 @@ public class SqlObjectFunction extends SqlObject {
 
     public static String SUM = "SUM";
     public static String COUNT = "COUNT";
+    public static String MIN = "MIN";
+    public static String MAX = "MAX";
+    public static String AVG = "AVG";
     public static String PARENTHESIS = "(";
 
-    public SqlObjectFunction(String _name) {
+    private boolean isCommaInserted = false;
+
+    public SqlObjectFunction(String _name, boolean _isCommaInserted) {
         setName(_name);
+        isCommaInserted = _isCommaInserted;
     }
 
     @Override
     public void build(List<Object> _statement, StatementProvider.BUILDTYPE _type) {
         // insert Function
-        SqlObjectValue.buildString(_statement,getName());
+        String name = getName();
+        if(!name.equals(PARENTHESIS)) {
+           name += LPARENTHESIS;
+        }
+        SqlObjectValue.buildString(_statement,name);
 
         for(int i = 0; i < childObjects.size(); i++) {
-            // insert ( for general Function, ex) COUNT"("
-            if(i == 0 && !name.equals((PARENTHESIS))) {
-                SqlObjectValue.buildString(_statement,LPARENTHESIS);
-            }
 
             childObjects.get(i).build(_statement, _type);
 
             if(i == childObjects.size() - 1) {
                 break;
             }
-            if(name.equals(PARENTHESIS)) {
-                SqlObjectValue.buildString(_statement,COMMA);
-            } else {
+            if(name.equals(PARENTHESIS) && isCommaInserted) {
+                SqlObjectValue.buildString(_statement, COMMA);
             }
         }
         // insert ) for all Function

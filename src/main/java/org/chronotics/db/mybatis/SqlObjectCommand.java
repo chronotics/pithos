@@ -11,7 +11,7 @@ public class SqlObjectCommand extends SqlObject {
 //    public static String VALUESLIST = "VALUESLIST";
     public static String INSERTMULTI = "INSERT";
     public static String UPDATE = "UPDATE";
-    public static String DELETE = "DELETE";
+    public static String DELETE = "DELETE FROM";
     public static String FROM = "FROM";
     public static String WHERE = "WHERE";
     public static String WHERENOT = "WHERE NOT";
@@ -29,6 +29,7 @@ public class SqlObjectCommand extends SqlObject {
     public static String LEFTJOIN = "LEFT JOIN";
     public static String RIGHTJOIN = "RIGHT JOIN";
     public static String FULLOUTERJOIN = "FULL OUTER JOIN";
+    public static String UNION = "UNION";
     public static String ON = "ON";
     public static String LIMIT = "LIMIT";
 

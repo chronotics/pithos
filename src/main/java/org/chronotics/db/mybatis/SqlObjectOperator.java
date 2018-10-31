@@ -40,6 +40,11 @@ public class SqlObjectOperator extends SqlObject {
         return this;
     }
 
+    public SqlObjectOperator setRightOperand(Object _object, boolean _isParameter) {
+        addChild(_object, _isParameter);
+        return this;
+    }
+
     @Override
     public void build(List<Object> _statement, StatementProvider.BUILDTYPE _type) {
         assert(leftOperand != null);

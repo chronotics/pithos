@@ -1,0 +1,658 @@
+//package org.chronotics.db.mybatis;
+//
+//import org.json.JSONArray;
+//import org.json.JSONException;
+//import org.json.JSONObject;
+//
+//import java.lang.reflect.Constructor;
+//import java.lang.reflect.InvocationTargetException;
+//import java.util.*;
+//import java.util.Map.Entry;
+//import java.util.stream.Collectors;
+//
+//public class SqlStatement {
+//	public static class KEYWORD {
+//		public static String TABLENAME = "tableName";
+//		public static String RESULTSET = "resultSet";
+//		public static String COLNAMES = "colNames";
+//		public static String COLVALUES = "colValues";
+//		public static String COLVARIABLES = "colVariables";
+//		public static String RECORDS = "records";
+//		public static String WHERECLAUSE = "whereClause";
+//		public static String STATEMENT = "statement";
+//	}
+//
+//	public static class COMMAND {
+//		public static String SELECT = "select";
+//		public static String INSERT = "insert";
+//		public static String UPDATE = "update";
+//		public static String DELETE = "delete";
+//		public static String FROM = "from";
+//		public static String WHERECONDITION = "whereCondition";
+//        public static String JOINCONDITION = "joinCondition";
+//        public static String GROUPCONDITION = "groupCondition";
+//        public static String ORDERCONDITION = "orderCondition";
+//		public static String WHERE = "where";
+//		public static String WHERENOT = "whereNot";
+//		public static String AND = "and";
+//		public static String NOT = "not";
+//		public static String ANDNOT = "andNot";
+//		public static String OR = "or";
+//		public static String ORNOT = "orNot";
+//		public static String ORDERBY = "orderBy";
+//		public static String ORDERBYASCORDEC = "orderByAscOrDec";
+//		public static String ASC = "ASC";
+//		public static String DESC= "DESC";
+//		public static String SET = "set";
+//		public static String INNERJOIN = "innerJoin";
+//		public static String LEFTJOIN = "leftJoin";
+//		public static String RIGHTJOIN = "rightJoin";
+//		public static String FULLOUTERJOIN = "fullOuterJoin";
+//		public static String ON = "on";
+//	}
+//
+//	public static class NUMERIC_FUNCTION {
+//		public static String AVG = "avg";
+//		public static String COUNT = "count";
+//		public static String COS = "cos";
+//		public static String SIN = "sin";
+//		public static String SQRT = "sqrt";
+//		public static String SUM = "sum";
+//		public static String TAN = "tan";
+//	}
+//
+//	@FunctionalInterface
+//	interface BinaryFunction {
+//		public void function(Object _lo, Object _ro);
+//	}
+//
+//	@FunctionalInterface
+//    interface UnaryFunction {
+//	    public void function(Object _o);
+//    }
+//
+//	protected static Map<String, OPERATOR> operatorMap = new HashMap<String, OPERATOR>();
+//	public static enum OPERATOR {
+//		PARENTHESIS_LEFT("("),
+//		PARENTHESIS_RIGHT(")"),
+//		COMMA(","),
+//		AND("AND"),
+//		OR("OR"),
+//		NOT("NOT"),
+//		EQ("="),
+//		LT("<"),
+//		LE("<="),
+//		NE("<>"),
+//		GE(">="),
+//		GT(">"),
+//		BETWEEN("BETWEEN"),
+//		LIKE("LIKE"),
+//		IN("IN");
+//		private String str;
+//		OPERATOR(String _arg) {
+//			str = _arg;
+//			operatorMap.put(_arg,this);
+//		}
+//		public String toString() {
+//			return str;
+//		}
+//	}
+//
+//	public static OPERATOR getOperator(String _name) {
+//		return operatorMap.get(_name);
+//	}
+//
+//	/**
+//	 * toVV
+//	 * @param _object
+//	 * @return
+//	 * convert input Object to variable value Object
+//	 */
+//	public static Object toVV(Object _object) {
+//		if(_object instanceof String) {
+//			String temp = (String)_object;
+//			return new String("\'" + temp + "\'");
+//		} else if(_object instanceof Number) {
+//			return _object;
+//		} else {
+//			return _object;
+//		}
+//	}
+//	private Map<Object,Object> sqlParameter = new HashMap<Object,Object>();
+//
+//	public Map<Object,Object> getParameter() {
+//		return sqlParameter;
+//	}
+//
+//	public static class Builder {
+//		// for final return value
+//		private Map<Object,Object> sqlParameter = new HashMap<Object,Object>();
+//		// for temporary
+//		private List<Object> selectList = null;
+//		private List<Object> fromList = null;
+//		private List<Object> insertList = null;
+//		private List<Object> updateList = null;
+//		private Map<String, Object> setMap = null;
+//		private List<Object> deleteList = null;
+//		private List<Object> whereList = null;
+//		private List<Object> whereClause = null;
+//		private Map<String,Object> whereMap = null;
+//		private List<Object> colNames = null;
+//		private List<Object> colValues = null;
+//		private List<Object> records = null;
+//
+//		public Builder() {}
+//
+//		public SqlStatement build() {
+//			SqlStatement sqlStatement = new SqlStatement();
+//			if(whereMap != null) {
+//				if(!whereMap.isEmpty()) {
+//					sqlParameter.put(COMMAND.WHERECONDITION, whereMap);
+//				}
+//			}
+//
+//			if(colNames != null && colValues !=null) {
+//				if(!colNames.isEmpty() && !colValues.isEmpty()) {
+//					assert(colNames.size() == colValues.size());
+//					sqlParameter.put(KEYWORD.COLNAMES, colNames);
+//					sqlParameter.put(KEYWORD.COLVALUES, colValues);
+//				}
+//			}
+//
+//			if(colNames != null && records != null) {
+//				if(!colNames.isEmpty() && !records.isEmpty()) {
+//					sqlParameter.put(KEYWORD.COLNAMES, colNames);
+//					sqlParameter.put(KEYWORD.RECORDS, records);
+//				}
+//			}
+//
+//			sqlStatement.sqlParameter =
+//					this.sqlParameter
+//					.entrySet()
+//					.stream()
+//					.collect(Collectors.toMap(
+//							Entry::getKey,
+//							Entry::getValue));
+//
+//			return sqlStatement;
+//		}
+//
+//		public Builder select(Object ...object) {
+//			if(selectList == null) {
+//				selectList = new ArrayList<Object>();
+//			}
+//			selectList.clear();
+//			for(Object e: object) {
+//				assert(e instanceof String);
+//				selectList.add(e);
+//			}
+//			sqlParameter.put(COMMAND.SELECT, selectList);
+//			return this;
+//		}
+//
+//		public Builder from(Object object) {
+//			if(fromList == null) {
+//				fromList = new ArrayList<Object>();
+//			}
+//			fromList.clear();
+//			fromList.add(object);
+//			sqlParameter.put(COMMAND.FROM, fromList);
+//			return this;
+//		}
+//
+//		public Builder insert(Object object) {
+//			if(insertList == null) {
+//				insertList = new ArrayList<Object>();
+//			}
+//			insertList.clear();
+//			insertList.add(object);
+//			sqlParameter.put(COMMAND.INSERT, insertList);
+//			return this;
+//		}
+//
+//		public Builder update(Object object) {
+//			if(updateList == null) {
+//				updateList = new ArrayList<Object>();
+//			}
+//			updateList.clear();
+//			updateList.add(object);
+//			sqlParameter.put(COMMAND.UPDATE, updateList);
+//			return this;
+//		}
+//
+//		public Builder set(
+//				String name,
+//				Object value) {
+//			if(setMap == null) {
+//				setMap = new LinkedHashMap<String,Object>();
+//			}
+//			assert(setMap.size()==0);
+//			setMap.clear();
+//			setMap.put(name, value);
+//			sqlParameter.put(COMMAND.SET, setMap);
+//			return this;
+//		}
+//
+//		public Builder set(
+//				Map<String, Object> variableMap) {
+//			if(setMap == null) {
+//				setMap = new LinkedHashMap<String,Object>();
+//			}
+//			assert(setMap.size()==0);
+//			setMap.clear();
+//			setMap.putAll(variableMap);
+//			sqlParameter.put(COMMAND.SET, setMap);
+//			return this;
+//		}
+//
+//		public Builder delete(Object object) {
+//			if(deleteList == null) {
+//				deleteList = new ArrayList<Object>();
+//			}
+//			deleteList.clear();
+//			deleteList.add(object);
+//			sqlParameter.put(COMMAND.DELETE, deleteList);
+//			return this;
+//		}
+//
+//		private void addClauseToWhereList(String clause) {
+//			whereList.add(clause);
+//		}
+//
+//		private void addObjectToWhereList(Object object) {
+//			if(object instanceof List) {
+//				if(object instanceof Builder) {
+//					this.addObjectToWhereList("(");
+//				}
+//				for(Object e: (List<?>)object) {
+//					this.addObjectToWhereList(e);
+//				}
+//				if(object instanceof Builder) {
+//					this.addObjectToWhereList(")");
+//				}
+//			} else {
+//				whereList.add(object);
+//			}
+//		}
+//
+//		private void clearWhereList() {
+//			whereList.clear();
+//		}
+//
+//		public Builder where(
+//				String clause) {
+//			if(clause == null) {
+//				return this;
+//			}
+//
+//			if(whereList == null) {
+//				whereList = new ArrayList<Object>();
+//			}
+//			if(whereMap == null) {
+//				whereMap = new LinkedHashMap<String,Object>();
+//			}
+//			this.clearWhereList();
+//			this.addClauseToWhereList(clause);
+//			assert(whereMap.get(COMMAND.WHERE) == null);
+//			assert(whereMap.get(COMMAND.WHERENOT) == null);
+//			whereMap.put(COMMAND.WHERE, whereList);
+//			// don't clear
+//			//this.clearWhereList();
+//			return this;
+//		}
+//
+//		public Builder where(
+//				Object leftOperand,
+//				OPERATOR operator,
+//				Object rightOperand) {
+//			if(whereList == null) {
+//				whereList = new ArrayList<Object>();
+//			}
+//			if(whereMap == null) {
+//				whereMap = new LinkedHashMap<String,Object>();
+//			}
+//
+//			this.clearWhereList();
+//			this.addObjectToWhereList(leftOperand);
+//			this.addObjectToWhereList(operator);
+//			this.addObjectToWhereList(rightOperand);
+//			assert(whereMap.get(COMMAND.WHERE) == null);
+//			assert(whereMap.get(COMMAND.WHERENOT) == null);
+//
+//			whereMap.put(COMMAND.WHERE, whereList);
+//			// don't clear
+//			//this.clearWhereList();
+//			return this;
+//		}
+//
+//		public Builder whereNot(
+//				Object leftOperand,
+//				OPERATOR operator,
+//				Object rightOperand) {
+//			this.clearWhereList();
+//			this.addObjectToWhereList(leftOperand);
+//			this.addObjectToWhereList(operator);
+//			this.addObjectToWhereList(rightOperand);
+//			assert(whereMap.get(COMMAND.WHERE) == null);
+//			assert(whereMap.get(COMMAND.WHERENOT) == null);
+//
+//			whereMap.put(COMMAND.WHERENOT, whereList);
+//			// don't clear
+//			//this.clearWhereList();
+//			return this;
+//		}
+//
+//		public Builder and(
+//				Object leftOperand,
+//				OPERATOR operator,
+//				Object rightOperand) {
+//			this.clearWhereList();
+//			this.addObjectToWhereList(leftOperand);
+//			this.addObjectToWhereList(operator);
+//			this.addObjectToWhereList(rightOperand);
+//
+//			whereMap.put(COMMAND.AND, whereList);
+//			// don't clear
+//			//this.clearWhereList();
+//			return this;
+//		}
+//
+//		public Builder andNot(
+//				Object leftOperand,
+//				OPERATOR operator,
+//				Object rightOperand) {
+//			this.clearWhereList();
+//			this.addObjectToWhereList(leftOperand);
+//			this.addObjectToWhereList(operator);
+//			this.addObjectToWhereList(rightOperand);
+//
+//			whereMap.put(COMMAND.ANDNOT, whereList);
+//			// don't clear
+//			//this.clearWhereList();
+//			return this;
+//		}
+//
+//		public Builder or(
+//				Object leftOperand,
+//				OPERATOR operator,
+//				Object rightOperand) {
+//			this.clearWhereList();
+//			this.addObjectToWhereList(leftOperand);
+//			this.addObjectToWhereList(operator);
+//			this.addObjectToWhereList(rightOperand);
+//
+//			whereMap.put(COMMAND.OR, whereList);
+//			// don't clear
+//			//this.clearWhereList();
+//			return this;
+//		}
+//
+//		public Builder orNot(
+//				Object leftOperand,
+//				OPERATOR operator,
+//				Object rightOperand) {
+//			this.clearWhereList();
+//			this.addObjectToWhereList(leftOperand);
+//			this.addObjectToWhereList(operator);
+//			this.addObjectToWhereList(rightOperand);
+//
+//			whereMap.put(COMMAND.ORNOT, whereList);
+//			// don't clear
+//			//this.clearWhereList();
+//			return this;
+//		}
+//
+//		public Builder colValue(
+//				String name,
+//				Object value) {
+//			if(colNames == null) {
+//				colNames = new ArrayList<Object>();
+//			}
+//			if(colValues == null) {
+//				colValues = new ArrayList<Object>();
+//			}
+//
+//			this.colNames.add(name);
+//			this.colValues.add(value);
+//			return this;
+//		}
+//
+//		public Builder colValues(
+//				List<Object> _colNames,
+//				List<Object> _colValues) {
+//			if(colNames == null) {
+//				colNames = new ArrayList<Object>();
+//			}
+//			if(colValues == null) {
+//				colValues = new ArrayList<Object>();
+//			}
+//
+//			colNames.addAll(_colNames);
+//			colValues.addAll(_colValues);
+//			return this;
+//		}
+//
+//		public Builder records(
+//				List<Object> _colNames,
+//				List<List<Object>> _records) {
+//			if(colNames == null) {
+//				colNames = new ArrayList<Object>();
+//			}
+//			colNames.addAll(_colNames);
+//
+//			if(records == null) {
+//				records = new ArrayList<Object>();
+//			}
+//
+//			for(List<Object> record: _records) {
+//				List<Object> element = new ArrayList<Object>(record);
+//				records.add(element);
+//			}
+//
+//			return this;
+//		}
+//	}
+//
+//	static Object createObject(String _className)
+//			throws ClassNotFoundException,
+//			NoSuchMethodException,
+//			SecurityException,
+//			InstantiationException,
+//			IllegalAccessException,
+//			IllegalArgumentException,
+//			InvocationTargetException {
+//		Class<?> c = Class.forName(_className);
+//		Constructor<?> cons = c.getConstructor(String.class);
+//		Object object = cons.newInstance();
+//		return object;
+//	}
+//
+//	public static String getTableName(String _json) throws JSONException {
+//		JSONObject jsonObject = new JSONObject(_json);
+//		return (String)jsonObject.get(KEYWORD.TABLENAME);
+//	}
+//
+//	public static String getWhereClause(String _json) throws JSONException {
+//		JSONObject jsonObject = new JSONObject(_json);
+//		return (String)jsonObject.get(KEYWORD.WHERECLAUSE);
+//	}
+//
+//	public static Map<String, Object> getColVariables(String _json) throws JSONException {
+//		Map<String, Object> rtObject = null;
+//		JSONObject jsonObject = new JSONObject(_json);
+//		Object obj = jsonObject.get(KEYWORD.COLVARIABLES);
+//		if(obj instanceof JSONArray == false) {
+//			throw new JSONException("There is no SqlStatement.COLVARIABLES");
+//		}
+//		rtObject = new LinkedHashMap<String, Object>();
+//		JSONArray array = (JSONArray)obj;
+//		for(int i=0; i<array.length(); i++) {
+//			JSONObject element = (JSONObject) array.get(i);
+//			@SuppressWarnings("unchecked")
+//			Iterator<String> iterator = element.keys();
+//			while(iterator.hasNext()) {
+//				String name = iterator.next();
+//				rtObject.put(name, element.get(name));
+//			}
+//		}
+//		return rtObject;
+//	}
+//
+//	public static List<Object> getColNames(String _json) throws JSONException {
+//		List<Object> rtObject = null;
+//		JSONObject jsonObject = new JSONObject(_json);
+//		Object obj = jsonObject.get(KEYWORD.COLNAMES);
+//		if(obj instanceof JSONArray == false) {
+//			throw new JSONException("There is no SqlStatement.COLNAMES");
+//		}
+//		rtObject = new ArrayList<Object>();
+//		JSONArray array = (JSONArray)obj;
+//		for(int i=0; i<array.length(); i++) {
+//			rtObject.add(array.get(i));
+//		}
+//		return rtObject;
+//	}
+//
+//	public static List<Object> getColValues(String _json) throws JSONException {
+//		List<Object> rtObject = null;
+//		JSONObject jsonObject = new JSONObject(_json);
+//		Object obj = jsonObject.get(KEYWORD.COLVALUES);
+//		if(obj instanceof JSONArray == false) {
+//			throw new JSONException("There is no SqlStatement.COLVALUES");
+//		}
+//		rtObject = new ArrayList<Object>();
+//		JSONArray array = (JSONArray)obj;
+//		for(int i=0; i<array.length(); i++) {
+//			rtObject.add(array.get(i));
+//		}
+//		return rtObject;
+//	}
+//
+//	public static List<List<Object>> getRecords(String _json) throws JSONException {
+//		List<List<Object>> rtObject = null;
+//		JSONObject jsonObject = new JSONObject(_json);
+//		Object obj = jsonObject.get(KEYWORD.RECORDS);
+//		if(obj instanceof JSONArray == false) {
+//			throw new JSONException("There is no SqlStatement.RECORDS");
+//		}
+//		JSONArray jsonArrayRecords = (JSONArray)obj;
+//		rtObject = new ArrayList<List<Object>>();
+//		for(int i=0; i<jsonArrayRecords.length(); i++) {
+//			JSONArray jsonArrayRecord = jsonArrayRecords.getJSONArray(i);
+//			if(jsonArrayRecord == null) {
+//				throw new JSONException("There is no array in records");
+//			}
+//			List<Object> record = new ArrayList<Object>();
+//			for(int j=0; j<jsonArrayRecord.length(); j++) {
+//				record.add(jsonArrayRecord.get(j));
+//			}
+//			rtObject.add(record);
+//		}
+//		return rtObject;
+//	}
+//
+//	/**
+//	 *
+//	 * @param _resultSet
+//	 * @param count_from
+//	 * if(count_from <= i && i < count_to)
+//	 * @param count_to
+//	 * @return
+//	 */
+//	public static JSONObject getJSonObject(
+//			List<Map<String,Object>> _resultSet,
+//			int count_from,
+//			int count_to) {
+//		JSONObject object = new JSONObject();
+//		JSONArray jsonArray = new JSONArray();
+//		int i = 0;
+//		for(Map<String,Object> element: _resultSet) {
+//			if(count_from <= i && i < count_to) {
+//				JSONObject jsonChild = new JSONObject();
+//				for(Entry<String,Object> entry: element.entrySet()) {
+//					Object entryObj = entry.getValue();
+//					try {
+//						jsonChild.put(entry.getKey(), entryObj);
+//					} catch (JSONException e) {
+//						e.printStackTrace();
+//						return null;
+//					}
+//				}
+//				jsonArray.put(jsonChild);
+//			}
+//			i++;
+//		}
+//		try {
+//			object.put("resultSet", jsonArray);
+//		} catch (JSONException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		return object;
+//	}
+//
+//	public static JSONObject getJSonObject(
+//			List<Map<String,Object>> _resultSet,
+//			String _resultType,
+//			int count_from,
+//			int count_to) {
+//		JSONObject object = new JSONObject();
+//		JSONArray columns = new JSONArray();
+//        Set<String> columnSet = new HashSet<>();
+//		JSONArray dataSource = new JSONArray();
+//		int i = 0;
+//		boolean columnSetAdded = false;
+//		for (Map<String, Object> element : _resultSet) {
+//			if (count_from <= i && i < count_to) {
+//				JSONObject jsonChild = new JSONObject();
+//				for (Entry<String, Object> entry : element.entrySet()) {
+//					Object entryObj = entry.getValue();
+//					try {
+//						jsonChild.put(entry.getKey(), entryObj);
+//					} catch (JSONException e) {
+//						e.printStackTrace();
+//						return null;
+//					}
+//					if(columnSetAdded == false) {
+//					    columnSet.add(entry.getKey());
+//                    }
+//				}
+//				dataSource.put(jsonChild);
+//				if(columnSetAdded == false && !columnSet.isEmpty()) {
+//                    for(String v : columnSet) {
+//                        JSONObject jsonColumn = new JSONObject();
+//                        try {
+//                            jsonColumn.put("title", v);
+//                            jsonColumn.put("dataIndex", v);
+//                            jsonColumn.put("key", v);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                        columns.put(jsonColumn);
+//                    }
+//                    columnSetAdded = true;
+//                }
+//			}
+//			i++;
+//		}
+//		switch(_resultType) {
+//            case "antd":
+//                try {
+//                    object.put("dataSource", dataSource);
+//                } catch (JSONException e) {
+//                    // TODO Auto-generated catch block
+//                    e.printStackTrace();
+//                }
+//                try {
+//                    object.put("columns", columns);
+//                } catch (JSONException e) {
+//                    // TODO Auto-generated catch block
+//                    e.printStackTrace();
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//		return object;
+//	}
+//}
